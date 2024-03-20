@@ -1,0 +1,23 @@
+[workspace]
+members = [
+  "sbe-schema-cli",
+  "sbe-schema",
+]
+resolver = "2"
+
+[workspace.dependencies]
+anyhow = "1"
+clap = { version = "4.5", features = ["derive"] }
+thiserror = "1"
+quick-xml = "0.31"
+serde = { version = "1.0", features = ["derive"] }
+semver = "1"
+serde-semver = "0.2"
+
+[profile.release]
+debug = true
+strip = false
+
+[workspace.lints.rust]
+missing_docs = "deny"
+unused_crate_dependencies = "warn"

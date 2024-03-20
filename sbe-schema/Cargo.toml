@@ -1,0 +1,15 @@
+[package]
+name = "sbe-schema"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+quick-xml = { workspace = true, features = ["serialize"] }
+serde = { workspace = true }
+semver = { workspace = true }
+serde-semver = { workspace = true }
+
+[lints]
+workspace = true
