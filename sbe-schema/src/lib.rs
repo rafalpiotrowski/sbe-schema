@@ -12,7 +12,6 @@
 //! ```
 //! 
 use serde::Deserialize;
-use semver::Version;
 use serde_semver::SemverReq;
 
 #[derive(Debug, PartialEq, Default, Deserialize)]
@@ -23,13 +22,217 @@ struct Schema {
     #[serde(rename = "@id")]
     id: i32,
     #[serde(rename = "@version")]
-    version: u32,  
+    version: Option<u32>,  
     #[serde(rename = "@semanticVersion")]
     semantic_version: SematicVersion,
     #[serde(rename = "@description")]
     description: String,
     #[serde(rename = "@byteOrder")]
-    byte_order: ByteOrder,
+    byte_order: Option<ByteOrder>,
+    #[serde(rename = "include")]
+    include: Option<Vec<Include>>,
+    #[serde(rename = "types")]
+    types: Option<Vec<Types>>,
+    #[serde(rename = "message")]
+    messages: Option<Vec<Message>>,
+}
+
+#[derive(Debug, PartialEq, Default, Deserialize)]
+#[serde(rename = "xi:include")]
+struct Include {
+    #[serde(rename = "@href")]
+    href: String,
+}
+
+#[derive(Debug, PartialEq, Default, Deserialize)]
+#[serde(rename = "sbe:message")]
+struct Message {
+    #[serde(rename = "@name")]
+    name: String,
+    #[serde(rename = "@description")]
+    desciption: Option<String>,
+    #[serde(rename = "@id")]
+    id: u32,
+    #[serde(rename = "field")]
+    fields: Option<Vec<Field>>,
+    #[serde(rename = "group")]
+    groups: Option<Vec<Group>>,
+    #[serde(rename = "semanticType")]
+    semantic_type: Option<String>,
+}
+
+#[derive(Debug, PartialEq, Default, Deserialize)]
+#[serde(rename = "group")]
+struct Group {
+    #[serde(rename = "@name")]
+    name: String,
+    #[serde(rename = "@description")]
+    desciption: Option<String>,
+    #[serde(rename = "@id")]
+    id: u32,
+    #[serde(rename = "@dimensionType")]
+    dimension_type: String,
+    #[serde(rename = "field")]
+    fields: Option<Vec<Field>>,
+    #[serde(rename = "data")]
+    data: Option<Vec<Data>>,
+    #[serde(rename = "@sinceVersion")]
+    since_version: Option<u32>,
+}
+
+#[derive(Debug, PartialEq, Default, Deserialize)]
+#[serde(rename = "field")]
+struct Field {
+    #[serde(rename = "@name")]
+    name: String,
+    #[serde(rename = "@description")]
+    desciption: Option<String>,
+    #[serde(rename = "@id")]
+    id: u32,
+    #[serde(rename = "@type")]
+    r#type: String,
+    #[serde(rename = "@sinceVersion")]
+    since_version: Option<u32>,
+}
+
+#[derive(Debug, PartialEq, Default, Deserialize)]
+#[serde(rename = "data")]
+struct Data {
+    #[serde(rename = "@name")]
+    name: String,
+    #[serde(rename = "@description")]
+    desciption: Option<String>,
+    #[serde(rename = "@id")]
+    id: u32,
+    #[serde(rename = "@type")]
+    r#type: String,
+    #[serde(rename = "@sinceVersion")]
+    since_version: Option<u32>,
+}
+
+#[derive(Debug, PartialEq, Default, Deserialize)]
+#[serde(rename = "types")]
+struct Types {
+    #[serde(rename = "composite")]
+    composites: Option<Vec<Composite>>,
+    #[serde(rename = "enum")]
+    enums: Option<Vec<EnumType>>,
+}
+
+#[derive(Debug, PartialEq, Default, Deserialize)]
+#[serde(rename = "enum")]
+struct EnumType {
+    #[serde(rename = "@name")]
+    name: String,
+    #[serde(rename = "@description")]
+    description: Option<String>,
+    #[serde(rename = "@encodingType")]
+    encoding_type: Option<PrimitiveType>,
+    #[serde(rename = "validValue")]
+    valid_values: Option<Vec<ValidValue>>,
+}
+
+#[derive(Debug, PartialEq, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct ValidValue {
+    #[serde(rename = "@name")]
+    name: String,
+    #[serde(rename = "@description")]
+    description: Option<String>,
+    #[serde(rename = "$text")]
+    value: String,
+}
+
+
+#[derive(Debug, PartialEq, Default, Deserialize)]
+#[serde(rename = "composite")]
+struct Composite {
+    #[serde(rename = "@name")]
+    name: String,
+    #[serde(rename = "@description")]
+    description: Option<String>,
+    #[serde(rename = "type")]
+    types: Option<Vec<Type>>,
+    #[serde(rename = "ref")]
+    refs: Option<Vec<Ref>>,
+}
+
+#[derive(Debug, PartialEq, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Ref {
+    #[serde(rename = "@name")]
+    name: String,
+    #[serde(rename = "@description")]
+    description: Option<String>,
+    #[serde(rename = "@type")]
+    ref_type: String,
+    #[serde(rename = "@presence")]
+    presence: Option<Presence>,
+    #[serde(rename = "@valueRef")]
+    value_ref: Option<String>,
+}
+
+#[derive(Debug, PartialEq, Default, Deserialize)]
+struct Type {
+    #[serde(rename = "@name")]
+    name: String,
+    #[serde(rename = "@description")]
+    description: Option<String>,
+    #[serde(rename = "@primitiveType")]
+    primitive_type: Option<PrimitiveType>,
+    #[serde(rename = "@length")]
+    length: Option<u32>,
+    #[serde(rename = "@maxValue")]
+    max_value: Option<u32>,
+    #[serde(rename = "@characterEncoding")]
+    character_encoding: Option<Encoding>,
+    #[serde(rename = "@presence")]
+    presence: Option<Presence>,
+    #[serde(rename = "@sinceVersion")]
+    since_version: Option<u32>,
+}
+
+#[derive(Debug, PartialEq, Deserialize)]
+enum Encoding {
+    #[serde(rename = "ASCII")]
+    ASCII,
+    #[serde(rename = "UTF-8")]
+    UTF8,
+}
+
+#[derive(Debug, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+enum PrimitiveType {
+    #[serde(rename = "uint8")]
+    Uint8,
+    #[serde(rename = "int8")]
+    Int8,
+    #[serde(rename = "uint16")]
+    Uint16,
+    #[serde(rename = "int16")]
+    Int16,
+    #[serde(rename = "uint32")]
+    Uint32,
+    #[serde(rename = "int32")]
+    Int32,
+    #[serde(rename = "uint64")]
+    Uint64,
+    #[serde(rename = "int64")]
+    Int64,
+    #[serde(rename = "char")]
+    Char,
+    #[serde(rename = "float")]
+    Float,
+    #[serde(rename = "double")]
+    Double,
+}
+
+#[derive(Debug, PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+enum Presence {
+    Constant,
+    Required,
+    Optional,
 }
 
 #[derive(SemverReq, PartialEq, Default, )]
@@ -50,12 +253,6 @@ enum ByteOrder {
     BigEndian,
 }
 
-impl Default for ByteOrder {
-    fn default() -> Self {
-        ByteOrder::LittleEndian
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -64,15 +261,22 @@ mod tests {
     const XML: &str = r#"
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe"
-                       xmlns:xi="http://www.w3.org/2001/XInclude"
-                       package="sbe.messages"
-                       id="1"
-                       version="1"
+                       package="since.deprecated"
+                       id="876"
+                       version="4"
                        semanticVersion="5.2.0"
-                       description="sbe messages"
-                       byteOrder="littleEndian"> 
-        <sbe:message name="HelloMessage" id="1" description="hello message">
-            <field name="id" id="1" type="uint8"/>
+                       description="Issue 876 - Test case for Deprecated messages for Java"
+                       byteOrder="littleEndian">
+        <types>
+            <composite name="messageHeader" description="Message identifiers and length of message root">
+                <type name="blockLength" primitiveType="uint16"/>
+                <type name="templateId" primitiveType="uint16"/>
+                <type name="schemaId" primitiveType="uint16"/>
+                <type name="version" primitiveType="uint16"/>
+            </composite>
+        </types>
+        <sbe:message name="DeprecatedMessage" id="1" semanticType="n/a" description="Message deprecated since version 3" deprecated="3">
+            <field name="v1" id="1" type="uint64" />
         </sbe:message>
     </sbe:messageSchema>
 "#;
