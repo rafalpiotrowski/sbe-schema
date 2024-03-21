@@ -21,8 +21,7 @@ mod term;
 use clap::{command, Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(author, version, about = "SBE schema tool", long_about = None)]
-#[command(propagate_version = true)]
+#[command(author, version, about = "SBE schema tool", long_about = None, propagate_version = true)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
