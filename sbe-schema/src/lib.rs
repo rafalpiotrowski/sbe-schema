@@ -2,10 +2,11 @@
 //!
 //! `sbe-schema` is a library for working with SBE schema files.
 //!
+use serde_with::skip_serializing_none;
+use serde::{Deserialize, Serialize};
 
-use serde::Deserialize;
-
-#[derive(Debug, PartialEq, Default, Deserialize)]
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 #[serde(rename = "messageSchema")]
 struct Schema {
     #[serde(rename = "@package")]
@@ -28,15 +29,15 @@ struct Schema {
     messages: Option<Vec<Message>>,
 }
 
-#[derive(Debug, PartialEq, Default, Deserialize)]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 #[serde(rename = "include")]
 struct Include {
     #[serde(rename = "@href")]
     href: String,
 }
 
-#[derive(Debug, PartialEq, Default, Deserialize)]
-#[serde(rename = "message")]
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 struct Message {
     #[serde(rename = "@name")]
     name: String,
@@ -52,8 +53,8 @@ struct Message {
     semantic_type: Option<String>,
 }
 
-#[derive(Debug, PartialEq, Default, Deserialize)]
-#[serde(rename = "group")]
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 struct Group {
     #[serde(rename = "@name")]
     name: String,
@@ -71,8 +72,8 @@ struct Group {
     since_version: Option<u32>,
 }
 
-#[derive(Debug, PartialEq, Default, Deserialize)]
-#[serde(rename = "field")]
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 struct Field {
     #[serde(rename = "@name")]
     name: String,
@@ -86,8 +87,8 @@ struct Field {
     since_version: Option<u32>,
 }
 
-#[derive(Debug, PartialEq, Default, Deserialize)]
-#[serde(rename = "data")]
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 struct Data {
     #[serde(rename = "@name")]
     name: String,
@@ -101,8 +102,8 @@ struct Data {
     since_version: Option<u32>,
 }
 
-#[derive(Debug, PartialEq, Default, Deserialize)]
-#[serde(rename = "types")]
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 struct Types {
     #[serde(rename = "composite")]
     composites: Option<Vec<Composite>>,
@@ -110,8 +111,8 @@ struct Types {
     enums: Option<Vec<EnumType>>,
 }
 
-#[derive(Debug, PartialEq, Default, Deserialize)]
-#[serde(rename = "enum")]
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 struct EnumType {
     #[serde(rename = "@name")]
     name: String,
@@ -123,8 +124,8 @@ struct EnumType {
     valid_values: Option<Vec<ValidValue>>,
 }
 
-#[derive(Debug, PartialEq, Default, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 struct ValidValue {
     #[serde(rename = "@name")]
     name: String,
@@ -134,8 +135,8 @@ struct ValidValue {
     value: String,
 }
 
-#[derive(Debug, PartialEq, Default, Deserialize)]
-#[serde(rename = "composite")]
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 struct Composite {
     #[serde(rename = "@name")]
     name: String,
@@ -147,8 +148,8 @@ struct Composite {
     refs: Option<Vec<Ref>>,
 }
 
-#[derive(Debug, PartialEq, Default, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 struct Ref {
     #[serde(rename = "@name")]
     name: String,
@@ -162,7 +163,8 @@ struct Ref {
     value_ref: Option<String>,
 }
 
-#[derive(Debug, PartialEq, Default, Deserialize)]
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 struct Type {
     #[serde(rename = "@name")]
     name: String,
@@ -182,7 +184,7 @@ struct Type {
     since_version: Option<u32>,
 }
 
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
 enum Encoding {
     #[serde(rename = "ASCII")]
     ASCII,
@@ -190,8 +192,7 @@ enum Encoding {
     UTF8,
 }
 
-#[derive(Debug, PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
 enum PrimitiveType {
     #[serde(rename = "uint8")]
     Uint8,
@@ -217,7 +218,7 @@ enum PrimitiveType {
     Double,
 }
 
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 enum Presence {
     Constant,
@@ -225,8 +226,7 @@ enum Presence {
     Optional,
 }
 
-#[derive(PartialEq, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Deserialize, Serialize)]
 struct SematicVersion(semver::Version);
 
 impl std::fmt::Debug for SematicVersion {
@@ -241,7 +241,7 @@ impl Default for SematicVersion {
     }
 }
 
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 enum ByteOrder {
     LittleEndian,
@@ -285,5 +285,8 @@ mod tests {
 
         assert_eq!(sbe.byte_order, Some(ByteOrder::LittleEndian));
         assert_eq!(sbe.semantic_version, SematicVersion(semver::Version::from_str("5.2").unwrap()));
+
+        let xml = quick_xml::se::to_string(&sbe).expect("Failed to serialize XML");
+        dbg!("{:?}", &xml);
     }
 }
