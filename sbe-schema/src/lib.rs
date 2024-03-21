@@ -182,6 +182,8 @@ struct Type {
     presence: Option<Presence>,
     #[serde(rename = "@sinceVersion")]
     since_version: Option<u32>,
+    #[serde(rename = "$text")]
+    value: Option<String>,
 }
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]

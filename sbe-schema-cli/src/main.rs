@@ -11,10 +11,53 @@
 //! ## Example
 //!
 //! ```shell
-//! sbe-schema-cli --input schema.xml --output schema.json
+//! sbe-schema-cli evolution compatibility --level full
 //! ```
 //!
+mod evolution;
+mod sbe_tool;
+mod term;
+
+use clap::{command, Parser, Subcommand};
+
+#[derive(Parser)]
+#[command(author, version, about = "SBE schema tool", long_about = None)]
+#[command(propagate_version = true)]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// check schema evolution compatibility
+    #[command(subcommand)]
+    Evolution(evolution::Commands),
+    /// work with SBE schemas using sbe-tool
+    #[command(subcommand)]
+    SbeTool(sbe_tool::Commands),
+}
 
 fn main() {
-    println!("Hello, world!");
+    let cli = Cli::parse();
+    
+    let result = match cli.command {
+        Commands::Evolution(args) => evolution::handle(args),
+        Commands::SbeTool(args) => sbe_tool::handle(args),
+    };
+    
+    if let Err(e) = &result {
+        if term::error(&format!("{e}")).is_err() {
+            // if we can't color the error message, just eprint it
+            eprintln!("{e}");
+        }
+    }
+
+    // reset terminal colors
+    _ = term::reset();
+
+    match result {
+        Ok(_) => std::process::exit(exitcode::OK),
+        Err(_) => std::process::exit(exitcode::DATAERR),
+    }
 }
