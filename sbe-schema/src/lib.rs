@@ -1,28 +1,19 @@
 //! # sbe-schema
-//! 
+//!
 //! `sbe-schema` is a library for working with SBE schema files.
-//! 
-//! ## Example
-//! 
-//! ```rust
-//! use sbe_schema::add;
-//! 
-//! let result = add(2, 2);
-//! assert_eq!(result, 4);
-//! ```
-//! 
+//!
+
 use serde::Deserialize;
-use serde_semver::SemverReq;
 
 #[derive(Debug, PartialEq, Default, Deserialize)]
-#[serde(rename = "sbe:messageSchema")]
+#[serde(rename = "messageSchema")]
 struct Schema {
     #[serde(rename = "@package")]
     package: String,
     #[serde(rename = "@id")]
     id: i32,
     #[serde(rename = "@version")]
-    version: Option<u32>,  
+    version: Option<u32>,
     #[serde(rename = "@semanticVersion")]
     semantic_version: SematicVersion,
     #[serde(rename = "@description")]
@@ -38,14 +29,14 @@ struct Schema {
 }
 
 #[derive(Debug, PartialEq, Default, Deserialize)]
-#[serde(rename = "xi:include")]
+#[serde(rename = "include")]
 struct Include {
     #[serde(rename = "@href")]
     href: String,
 }
 
 #[derive(Debug, PartialEq, Default, Deserialize)]
-#[serde(rename = "sbe:message")]
+#[serde(rename = "message")]
 struct Message {
     #[serde(rename = "@name")]
     name: String,
@@ -143,7 +134,6 @@ struct ValidValue {
     value: String,
 }
 
-
 #[derive(Debug, PartialEq, Default, Deserialize)]
 #[serde(rename = "composite")]
 struct Composite {
@@ -235,15 +225,20 @@ enum Presence {
     Optional,
 }
 
-#[derive(SemverReq, PartialEq, Default, )]
-#[version("5.2.0")]
-struct SematicVersion;
+#[derive(PartialEq, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct SematicVersion(semver::Version);
 
 impl std::fmt::Debug for SematicVersion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", SematicVersion::version())
+        write!(f, "{}.{}.{}", self.0.major, self.0.minor, self.0.patch)
     }
+}
 
+impl Default for SematicVersion {
+    fn default() -> Self {
+        SematicVersion(semver::Version::new(0, 0, 0))
+    }
 }
 
 #[derive(Debug, PartialEq, Deserialize)]
@@ -255,6 +250,8 @@ enum ByteOrder {
 
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
+
     use super::*;
     use quick_xml::de::from_str;
 
@@ -264,7 +261,7 @@ mod tests {
                        package="since.deprecated"
                        id="876"
                        version="4"
-                       semanticVersion="5.2.0"
+                       semanticVersion="5.2"
                        description="Issue 876 - Test case for Deprecated messages for Java"
                        byteOrder="littleEndian">
         <types>
@@ -285,5 +282,8 @@ mod tests {
     fn it_works() {
         let sbe: Schema = from_str(XML).expect("Failed to parse XML");
         dbg!("{:?}", &sbe);
+
+        assert_eq!(sbe.byte_order, Some(ByteOrder::LittleEndian));
+        assert_eq!(sbe.semantic_version, SematicVersion(semver::Version::from_str("5.2").unwrap()));
     }
 }
