@@ -19,7 +19,7 @@ pub enum CompatibilityLevel {
 
 #[derive(Error, Debug)]
 pub enum EvolutionError {
-    #[error("Schema is not compatible with the latest schema: {0:?}")]
+    #[error("Schema is not compatible with the latest schema! Compatibility level: {0:?}")]
     SchemaNotCompatible(CompatibilityLevel),
 }
 
@@ -56,6 +56,16 @@ impl<E: EvolutionStrategy> Validator<E> {
         self.strategy.check(latest_schema, current_schema)
     }
 }
+
+/// A strategy that accepts all changes.
+pub struct NoneStrategy;
+
+impl EvolutionStrategy for NoneStrategy {
+    fn compatibility_level(&self) -> CompatibilityLevel {
+        CompatibilityLevel::None
+    }
+}
+
 
 #[cfg(test)]
 mod tests {

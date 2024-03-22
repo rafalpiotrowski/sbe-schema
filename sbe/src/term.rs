@@ -38,12 +38,12 @@ pub fn reset() -> io::Result<()> {
 // }
 
 /// Write a info message
-// pub fn info(text: &str) -> io::Result<()> {
-//     let mut stdout = StandardStream::stdout(ColorChoice::Always);
-//     stdout.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
-//     writeln!(&mut stdout, "{text}")?;
-//     Ok(())
-// }
+pub fn info(text: &str) -> io::Result<()> {
+    let mut stdout = StandardStream::stdout(ColorChoice::Always);
+    stdout.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+    writeln!(&mut stdout, "{text}")?;
+    Ok(())
+}
 
 /// Write a success message
 // pub fn success(text: &str) -> io::Result<()> {

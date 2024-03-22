@@ -3,26 +3,36 @@ use serde_with::skip_serializing_none;
 use serde::{Deserialize, Serialize};
 
 
+/// Structure that represent top level SBE schema.
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 #[serde(rename = "messageSchema")]
 pub struct Schema {
+    /// The package name of the schema.
     #[serde(rename = "@package")]
     pub package: String,
+    /// The id of the schema.
     #[serde(rename = "@id")]
     pub id: i32,
+    /// The version of the schema.
     #[serde(rename = "@version")]
     pub version: Option<u32>,
+    /// The semantic version of the schema.
     #[serde(rename = "@semanticVersion")]
     pub semantic_version: SematicVersion,
+    /// The description of the schema.
     #[serde(rename = "@description")]
     pub description: String,
+    /// The byte order of the bytes.
     #[serde(rename = "@byteOrder")]
     pub byte_order: Option<ByteOrder>,
+    /// The include section of the schema.
     #[serde(rename = "include")]
     pub include: Option<Vec<Include>>,
+    /// The types of the schema.
     #[serde(rename = "types")]
     pub types: Option<Vec<Types>>,
+    /// The messages of the schema.
     #[serde(rename = "message")]
     pub messages: Option<Vec<Message>>,
 }
