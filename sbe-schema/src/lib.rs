@@ -109,6 +109,8 @@ struct Types {
     composites: Option<Vec<Composite>>,
     #[serde(rename = "enum")]
     enums: Option<Vec<EnumType>>,
+    #[serde(rename = "set")]
+    sets: Option<Vec<SetType>>,
 }
 
 #[skip_serializing_none]
@@ -127,6 +129,30 @@ struct EnumType {
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 struct ValidValue {
+    #[serde(rename = "@name")]
+    name: String,
+    #[serde(rename = "@description")]
+    description: Option<String>,
+    #[serde(rename = "$text")]
+    value: String,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+struct SetType {
+    #[serde(rename = "@name")]
+    name: String,
+    #[serde(rename = "@description")]
+    description: Option<String>,
+    #[serde(rename = "@encodingType")]
+    encoding_type: Option<PrimitiveType>,
+    #[serde(rename = "choice")]
+    choices: Option<Vec<Choice>>,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+struct Choice {
     #[serde(rename = "@name")]
     name: String,
     #[serde(rename = "@description")]
