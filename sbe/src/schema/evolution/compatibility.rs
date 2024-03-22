@@ -12,11 +12,8 @@ pub struct CompatibilityArgs {
 #[derive(Debug, Clone, ValueEnum)]
 pub enum CompatibilityLevel {
     Backward,
-    BackwardTransitive,
     Forward,
-    ForwardTransitive,
     Full,
-    FullTransitive,
     None,
 }
 
