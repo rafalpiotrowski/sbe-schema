@@ -1,22 +1,22 @@
-//! # sbe-schema-cli
+//! # sbe
 //!
-//! `sbe-schema-cli` is a command line tool for working with SBE schema files.
+//! `sbe` is a command line tool for working with SBE schema files.
 //!
 //! ## Usage
 //!
 //! ```shell
-//! sbe-schema-cli --help
+//! sbe --help
 //! ```
 //!
 //! ## Example
 //!
 //! ```shell
-//! sbe-schema-cli evolution compatibility --level full
+//! sbe schema generate -l rust -f schema.xml
 //! ```
 //!
-mod evolution;
-mod sbe_tool;
+mod schema;
 mod term;
+mod tool;
 
 use clap::{command, Parser, Subcommand};
 
@@ -29,22 +29,23 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// check schema evolution compatibility
+    /// Work with SBE schema files: validate and generate code for different languages
     #[command(subcommand)]
-    Evolution(evolution::Commands),
-    /// work with SBE schemas using sbe-tool
+    Schema(schema::Commands),
+    /// Work with SBE source code. Clone, build, and copy jar file for later use in code generation and schema validation.
+    /// Requires to have java installed and available in the PATH or specify the path to the java executable.
     #[command(subcommand)]
-    SbeTool(sbe_tool::Commands),
+    Tool(tool::Commands),
 }
 
 fn main() {
     let cli = Cli::parse();
-    
+
     let result = match cli.command {
-        Commands::Evolution(args) => evolution::handle(args),
-        Commands::SbeTool(args) => sbe_tool::handle(args),
+        Commands::Schema(args) => schema::handle(args),
+        Commands::Tool(args) => tool::handle(args),
     };
-    
+
     if let Err(e) = &result {
         if term::error(&format!("{e}")).is_err() {
             // if we can't color the error message, just eprint it

@@ -17,7 +17,7 @@ pub enum CompatibilityLevel {
     ForwardTransitive,
     Full,
     FullTransitive,
-    None
+    None,
 }
 
 pub fn check(_args: CompatibilityArgs) -> Result<()> {

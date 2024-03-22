@@ -65,9 +65,9 @@ pub fn run(args: GenerateArgs) -> Result<()> {
     if let Some(jar) = &args.jar {    
         cmd.arg("-jar").arg(jar);
     } else {
-        let version_file = Path::new(super::SBE_VERSION_FILE);
+        let version_file = Path::new(crate::tool::SBE_VERSION_FILE);
         let version = std::fs::read_to_string(version_file)?;
-        let jar_file = super::SBE_JAR_FORMAT.replace("{version}", &version.trim());
+        let jar_file = crate::tool::SBE_JAR_FORMAT.replace("{version}", &version.trim());
         cmd.arg("-jar").arg(jar_file);
     }
 

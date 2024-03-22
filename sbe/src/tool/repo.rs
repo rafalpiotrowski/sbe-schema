@@ -1,6 +1,14 @@
 use anyhow::{bail, Result};
-use git2::{build::{CheckoutBuilder, RepoBuilder}, FetchOptions, Progress, RemoteCallbacks};
-use std::{cell::RefCell, io::{self, Write}, path::{Path, PathBuf}, process::Command};
+use git2::{
+    build::{CheckoutBuilder, RepoBuilder},
+    FetchOptions, Progress, RemoteCallbacks,
+};
+use std::{
+    cell::RefCell,
+    io::{self, Write},
+    path::{Path, PathBuf},
+    process::Command,
+};
 
 struct State {
     progress: Option<Progress<'static>>,
@@ -24,7 +32,7 @@ pub fn clean() -> Result<()> {
 
     std::fs::remove_file(version_file)?;
     std::fs::remove_file(Path::new(jar.as_str()))?;
-    
+
     Ok(())
 }
 
@@ -58,12 +66,14 @@ pub fn build() -> Result<()> {
 
 /// Copy the SBE tool jar to the current directory
 pub fn copy_sbe_jar() -> Result<()> {
-
     let version_file = Path::new(CHECKOUT_DIR).join(SBE_VERSION_FILE);
     let version = std::fs::read_to_string(version_file.clone())?;
     let jar = super::SBE_JAR_FORMAT.replace("{version}", &version.trim());
     let src = Path::new(CHECKOUT_DIR)
-        .join("sbe-all").join("build").join("libs").join(&jar);
+        .join("sbe-all")
+        .join("build")
+        .join("libs")
+        .join(&jar);
 
     let dst = Path::new(&jar);
     std::fs::copy(src, dst)?;
@@ -74,7 +84,6 @@ pub fn copy_sbe_jar() -> Result<()> {
 
 /// Clone the SBE repository
 pub fn clone() -> Result<()> {
-
     let state = RefCell::new(State {
         progress: None,
         total: 0,
@@ -89,7 +98,7 @@ pub fn clone() -> Result<()> {
         print(&mut *state);
         true
     });
-    
+
     let mut co = CheckoutBuilder::new();
     co.progress(|path, cur, total| {
         let mut state = state.borrow_mut();
