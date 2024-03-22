@@ -1,10 +1,8 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{bail, Result};
+use anyhow::Result;
 use clap::{command, Parser, ValueEnum};
-use std::{
-    process::Command
-};
+use std::process::Command;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]

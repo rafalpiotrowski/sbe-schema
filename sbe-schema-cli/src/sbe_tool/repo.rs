@@ -1,6 +1,6 @@
 use anyhow::{bail, Result};
 use git2::{build::{CheckoutBuilder, RepoBuilder}, FetchOptions, Progress, RemoteCallbacks};
-use std::{cell::RefCell, io::{self, Write}, path::{Path, PathBuf}, process::Command};
+use std::{cell::RefCell, io::{self, BufRead, BufReader, Write}, path::{Path, PathBuf}, process::{Command, Stdio}};
 
 struct State {
     progress: Option<Progress<'static>>,
@@ -12,7 +12,7 @@ struct State {
 
 const GIT_URL: &str = "https://github.com/real-logic/simple-binary-encoding.git";
 const CHECKOUT_DIR: &str = ".simple-binary-encoding";
-const GRADLEW_CMD: &str = "gradlew";
+const GRADLEW_CMD: &str = "./gradlew";
 const SBE_VERSION_FILE: &str = "version.txt";
 
 /// Clean the SBE tool directory
@@ -30,8 +30,10 @@ pub fn rm_repo_folder() -> Result<()> {
 pub fn build() -> Result<()> {
     let output = Command::new(GRADLEW_CMD)
         .current_dir(Path::new(CHECKOUT_DIR))
-        .output()
-        .expect("Unable to execute build sbe");
+        .spawn()
+        .expect("Unable to spawn sbe build")
+        .wait_with_output()
+        .expect("Unable to execute sbe build");
 
     if !output.status.success() {
         let stderr = std::str::from_utf8(&output.stderr).unwrap();
