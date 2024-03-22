@@ -15,6 +15,7 @@ serde_with = "3.7"
 semver = { version = "1.0.23", features = ["serde"], git = "https://github.com/rafalpiotrowski/semver.git" , branch = "allow_missing_minor_patch"}
 termcolor = "1.4"
 exitcode = "1.1"
+git2 = "0.18"
 
 [profile.release]
 debug = true

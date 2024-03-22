@@ -10,6 +10,7 @@ clap = { workspace = true }
 anyhow = { workspace = true }
 termcolor = { workspace = true }
 exitcode = { workspace = true }
+git2 = { workspace = true }
 
 [lints]
 workspace = true
