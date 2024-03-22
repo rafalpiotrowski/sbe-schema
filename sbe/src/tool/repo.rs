@@ -61,6 +61,8 @@ pub fn build() -> Result<()> {
         bail!("SBE build failed\n{}", stderr);
     }
 
+    copy_sbe_jar()?;
+    
     Ok(())
 }
 

@@ -6,9 +6,13 @@ use clap::Subcommand;
 
 #[derive(Subcommand)]
 pub enum Commands {
+    /// clone SBE github repo to current directory under .simple-binary-encoding
     Clone,
+    /// build SBE using gradlew in the .simple-binary-encoding directory
     Build,
+    /// removed .simple-binary-encoding directory and SBE jar
     Clean,
+    /// copy the SBE jar to the current directory, build will do it but we can do it manually as well
     CopyJar,
 }
 
