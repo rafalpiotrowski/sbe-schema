@@ -7,20 +7,28 @@ use std::process::Command;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub struct GenerateArgs {
+    /// schema file to generate code from
     #[arg(long, short)]
     pub file: PathBuf,
+    /// output directory for generated code, default "generated"
     #[arg(long, short)]
     pub output_dir: Option<PathBuf>,
+    /// package name for generated code
     #[arg(long, short)]
     pub package: Option<String>,
+    /// namespace for generated code
     #[arg(long, short)]
     pub namespace: Option<String>,
+    /// enable xinclude processing, default true
     #[arg(long, short)]
     pub xinclude: Option<bool>,
+    /// target language for generated code
     #[arg(long, short, value_enum)]
     pub language: Language,
+    /// path to the SBE jar file, default uses the version in the SBE_VERSION file and current working directory
     #[arg(long, short)]
     pub jar: Option<PathBuf>,
+    /// path to the Java executable, default "java" and uses PATH
     #[arg(long)]
     pub java: Option<PathBuf>
 }
