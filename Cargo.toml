@@ -1,6 +1,6 @@
 [workspace]
 members = [
-  "sbe-schema-cli",
+  "sbe",
   "sbe-schema",
 ]
 resolver = "2"
