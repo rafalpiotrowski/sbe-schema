@@ -299,6 +299,11 @@ mod tests {
                 <type name="schemaId" primitiveType="uint16"/>
                 <type name="version" primitiveType="uint16"/>
             </composite>
+            <set name="OptionalExtras" encodingType="uint8">
+                <choice name="sunRoof">0</choice>
+                <choice name="sportsPack">1</choice>
+                <choice name="cruiseControl">2</choice>
+            </set>            
         </types>
         <sbe:message name="DeprecatedMessage" id="1" semanticType="n/a" description="Message deprecated since version 3" deprecated="3">
             <field name="v1" id="1" type="uint64" />
