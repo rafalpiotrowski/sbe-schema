@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use anyhow::{bail, Result};
+use anyhow::Result;
 use clap::{command, Parser};
 
 #[derive(Parser, Debug)]
@@ -11,6 +11,6 @@ pub struct ValidateArgs {
     pub file: PathBuf,
 }
 
-pub fn run(args: ValidateArgs) -> Result<()> {
+pub fn run(_args: ValidateArgs) -> Result<()> {
     Ok(())
 }

@@ -27,7 +27,7 @@ pub fn handle(command: Commands) -> Result<()> {
         Commands::Generate(args) => generate::run(args),
         Commands::Clone => repo::clone(),
         Commands::Build => repo::build(),
-        Commands::Clean => repo::rm_repo_folder(),
+        Commands::Clean => repo::clean(),
         Commands::CopyJar => repo::copy_sbe_jar(),
     }
 }

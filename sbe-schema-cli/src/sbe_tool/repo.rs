@@ -1,6 +1,6 @@
 use anyhow::{bail, Result};
 use git2::{build::{CheckoutBuilder, RepoBuilder}, FetchOptions, Progress, RemoteCallbacks};
-use std::{cell::RefCell, io::{self, BufRead, BufReader, Write}, path::{Path, PathBuf}, process::{Command, Stdio}};
+use std::{cell::RefCell, io::{self, Write}, path::{Path, PathBuf}, process::Command};
 
 struct State {
     progress: Option<Progress<'static>>,
@@ -15,8 +15,21 @@ const CHECKOUT_DIR: &str = ".simple-binary-encoding";
 const GRADLEW_CMD: &str = "./gradlew";
 const SBE_VERSION_FILE: &str = "version.txt";
 
+pub fn clean() -> Result<()> {
+    rm_repo_folder()?;
+
+    let version_file = Path::new(super::SBE_VERSION_FILE);
+    let version = std::fs::read_to_string(version_file)?;
+    let jar = super::SBE_JAR_FORMAT.replace("{version}", &version.trim());
+
+    std::fs::remove_file(version_file)?;
+    std::fs::remove_file(Path::new(jar.as_str()))?;
+    
+    Ok(())
+}
+
 /// Clean the SBE tool directory
-pub fn rm_repo_folder() -> Result<()> {
+fn rm_repo_folder() -> Result<()> {
     let dir = Path::new(CHECKOUT_DIR);
     if dir.exists() {
         std::fs::remove_dir_all(dir)?;
@@ -37,7 +50,7 @@ pub fn build() -> Result<()> {
 
     if !output.status.success() {
         let stderr = std::str::from_utf8(&output.stderr).unwrap();
-        panic!("SBE build failed\n{}", stderr);
+        bail!("SBE build failed\n{}", stderr);
     }
 
     Ok(())

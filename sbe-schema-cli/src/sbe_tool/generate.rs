@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 use clap::{command, Parser, ValueEnum};
 use std::process::Command;
 
@@ -80,7 +80,7 @@ pub fn run(args: GenerateArgs) -> Result<()> {
 
     if !output.status.success() {
         let stderr = std::str::from_utf8(&output.stderr).unwrap();
-        panic!("SBE generation failed\n{}", stderr);
+        bail!("SBE generation failed\n{}", stderr);
     }
     Ok(())
 }
