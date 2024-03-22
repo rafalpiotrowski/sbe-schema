@@ -1,4 +1,4 @@
-use anyhow::{bail, Result};
+use anyhow::Result;
 use clap::{command, Parser, ValueEnum};
 
 ///
@@ -20,6 +20,6 @@ pub enum CompatibilityLevel {
     None
 }
 
-pub fn check(args: CompatibilityArgs) -> Result<()> {
+pub fn check(_args: CompatibilityArgs) -> Result<()> {
     Ok(())
 }
