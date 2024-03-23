@@ -209,23 +209,22 @@ pub struct Type {
     #[serde(rename = "@length")]
     pub length: Option<u32>,
     #[serde(rename = "@maxValue")]
-    pub max_value: Option<u32>,
+    pub max_value: Option<String>,
+    #[serde(rename = "@minValue")]
+    pub min_value: Option<String>,
+    /// A special value that indicates that an optional value is not set. 
+    /// See encodings below for default nullValue for each type. 
+    /// Mutually exclusive with presence=required and constant.
+    #[serde(rename = "@nullValue")]
+    pub null_value: Option<String>,
     #[serde(rename = "@characterEncoding")]
-    pub character_encoding: Option<Encoding>,
+    pub character_encoding: Option<String>,
     #[serde(rename = "@presence")]
     pub presence: Option<Presence>,
     #[serde(rename = "@sinceVersion")]
     pub since_version: Option<u32>,
     #[serde(rename = "$text")]
     pub value: Option<String>,
-}
-
-#[derive(Debug, PartialEq, Deserialize, Serialize)]
-pub enum Encoding {
-    #[serde(rename = "ASCII")]
-    ASCII,
-    #[serde(rename = "UTF-8")]
-    UTF8,
 }
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
@@ -257,8 +256,13 @@ pub enum PrimitiveType {
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Presence {
+    /// The field has a constant value that need not be transmitted on the wire. 
+    /// Mutually exclusive with nullValue, minValue, and maxValue attributes.
     Constant,
+    /// The field must always be set. This is the default presence. Mutually exclusive with nullValue.
     Required,
+    /// The field need not be populated. A special null value indicates that a field is not set. 
+    /// The presence attribute may be specified on either on a field or its encoding.
     Optional,
 }
 
