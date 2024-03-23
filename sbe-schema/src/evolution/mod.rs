@@ -31,14 +31,41 @@ pub enum EvolutionError {
 
 /// A strategy for schema evolution.
 pub trait EvolutionStrategy {
+    /// The type of the schema we will be working against
+    type SchemaType;
     /// The compatibility level of the strategy.
     fn compatibility_level(&self) -> CompatibilityLevel;
     /// Check if the current schema is compatible with the latest schema.
-    fn check(&self, _latest_schema: Schema, _current_schema: Schema) -> Result<(), EvolutionError>
+    fn check(&self, _latest_schema: Self::SchemaType, _current_schema: Self::SchemaType) -> Result<(), EvolutionError>
     {
         match self.compatibility_level() {
             CompatibilityLevel::None => Ok(()),
             _ => Err(EvolutionError::SchemaNotCompatible(self.compatibility_level()))
+        }
+    }
+}
+
+/// A trait for validating schema versions.
+pub trait SchemaValidator {
+    /// The type of the schema we will be working against
+    type SchemaType;
+    /// Compare the version of the current schema with the latest schema.
+    fn compare_version(&self, _: &Self::SchemaType, _: &Self::SchemaType) -> Result<i8, EvolutionError>;
+}
+
+/// A validator for SBE schema versions.
+pub struct SbeSchemaValidator;
+
+impl SchemaValidator for SbeSchemaValidator {
+    type SchemaType = Schema;
+
+    fn compare_version(&self, latest: &Self::SchemaType, current: &Self::SchemaType) -> Result<i8, EvolutionError> {
+        if current.version > latest.version {
+            return Ok(1);
+        } else if current.version < latest.version {
+            return Ok(-1);
+        } else {
+            return Ok(0);
         }
     }
 }
@@ -53,20 +80,33 @@ impl<E: EvolutionStrategy> Validator<E> {
     /// Create a new validator with the given strategy.
     pub fn new(strategy: E) -> Self {
         Self {
-            strategy,
+            strategy
         }
     }
 
     /// Check if the current schema is compatible with the latest schema.
-    pub fn check(&self, latest_schema: Schema, current_schema: Schema) -> Result<(), EvolutionError> {
+    pub fn check(&self, latest_schema: E::SchemaType, current_schema: E::SchemaType) -> Result<(), EvolutionError> {
         self.strategy.check(latest_schema, current_schema)
     }
 }
 
 /// A strategy that accepts all changes.
-pub struct NoneCompatibility;
+pub struct NoneCompatibility<V:SchemaValidator> {
+    _validator: V
+}
 
-impl EvolutionStrategy for NoneCompatibility {
+impl<V:SchemaValidator> NoneCompatibility<V> {
+    /// Create a new `NoneCompatibility` strategy with the given validator.
+    pub fn new(validator: V) -> Self {
+        Self {
+            _validator: validator
+        }
+    }
+}
+
+impl<V:SchemaValidator> EvolutionStrategy for NoneCompatibility<V> {
+    type SchemaType = V::SchemaType;
+
     fn compatibility_level(&self) -> CompatibilityLevel {
         CompatibilityLevel::None
     }
@@ -77,11 +117,15 @@ impl EvolutionStrategy for NoneCompatibility {
 mod tests {
     use super::*;
 
-    struct TestStrategy(CompatibilityLevel);
+    struct TestStrategy<V:SchemaValidator> {
+        compatibility_level: CompatibilityLevel,
+        _validator: V,
+    }
 
-    impl EvolutionStrategy for TestStrategy {
+    impl<V:SchemaValidator> EvolutionStrategy for TestStrategy<V> {
+        type SchemaType = Schema;
         fn compatibility_level(&self) -> CompatibilityLevel {
-            self.0
+            self.compatibility_level
         }
     }
 
@@ -89,7 +133,10 @@ mod tests {
     fn test_validator_none() {
         let latest_schema = Schema::default();
         let current_schema = Schema::default();
-        let strategy = TestStrategy(CompatibilityLevel::None);
+        let strategy = TestStrategy { 
+            compatibility_level: CompatibilityLevel::None,
+            _validator: SbeSchemaValidator {},
+        };
 
         let validator = Validator::new(strategy);
         assert!(validator.check(latest_schema, current_schema).is_ok());
@@ -99,7 +146,10 @@ mod tests {
     fn test_validator() {
         let latest_schema = Schema::default();
         let current_schema = Schema::default();
-        let strategy = TestStrategy(CompatibilityLevel::Backward);
+        let strategy = TestStrategy { 
+            compatibility_level: CompatibilityLevel::Full,
+            _validator: SbeSchemaValidator {},
+        };
 
         let validator = Validator::new(strategy);
         assert!(validator.check(latest_schema, current_schema).is_err());

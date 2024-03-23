@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 use clap::{command, Parser, ValueEnum};
-use sbe_schema::{FullCompatibility, NoneCompatibility};
+use sbe_schema::{FullCompatibility, NoneCompatibility, SbeSchemaValidator};
 
 use crate::term::info;
 
@@ -48,7 +48,7 @@ pub fn check(args: CompatibilityArgs) -> Result<()> {
             info("Checking full compatibility")?;
             let latest_schema = latest.try_into()?;
             let current_schema = current.try_into()?;
-            let v = sbe_schema::Validator::new(FullCompatibility);
+            let v = sbe_schema::Validator::new(FullCompatibility::<SbeSchemaValidator>::new(SbeSchemaValidator {}));
             v.check(latest_schema, current_schema)?;
         },
         CompatibilityArgs { 
@@ -56,7 +56,7 @@ pub fn check(args: CompatibilityArgs) -> Result<()> {
             latest: _, current: _
          } => {
             info("Checking no compatibility")?;
-            let v = sbe_schema::Validator::new(NoneCompatibility);
+            let v = sbe_schema::Validator::new(NoneCompatibility::<SbeSchemaValidator>::new(SbeSchemaValidator{}));
             v.check(sbe_schema::Schema::default(), sbe_schema::Schema::default())?;
         },
     }
