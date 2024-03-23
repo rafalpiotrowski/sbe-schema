@@ -1,8 +1,14 @@
 //!
 //!
 
+mod backward;
+mod forward;
+mod full;
+
 use crate::types::Schema;
 use thiserror::Error;
+
+pub use full::FullCompatibility;
 
 /// The compatibility level of a schema evolution strategy.
 #[derive(Debug, Clone, Copy)]
@@ -58,9 +64,9 @@ impl<E: EvolutionStrategy> Validator<E> {
 }
 
 /// A strategy that accepts all changes.
-pub struct NoneStrategy;
+pub struct NoneCompatibility;
 
-impl EvolutionStrategy for NoneStrategy {
+impl EvolutionStrategy for NoneCompatibility {
     fn compatibility_level(&self) -> CompatibilityLevel {
         CompatibilityLevel::None
     }

@@ -5,12 +5,13 @@
 
 mod evolution;
 mod types;
+mod schema;
 
 use std::result::Result as StdResult;
 use thiserror::Error;
 use evolution::EvolutionError;
 
-pub use evolution::{CompatibilityLevel, EvolutionStrategy, Validator, NoneStrategy};
+pub use evolution::{CompatibilityLevel, EvolutionStrategy, Validator, NoneCompatibility, FullCompatibility};
 pub use types::Schema;
 
 /// Result type returned from methods that have [`enum@self::Error`].
