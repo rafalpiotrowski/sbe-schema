@@ -31,7 +31,9 @@ pub enum EvolutionError {
     #[error("Schema is not compatible with the latest schema! Compatibility level: {0:?}")]
     SchemaNotCompatible(CompatibilityLevel),
     #[error("Missing schema version")]
-    MissingVersion,
+    MissingVersion,    
+    #[error("Missing message header")]
+    MissingMessageHeader,
 }
 
 /// A strategy for schema evolution.
@@ -54,6 +56,12 @@ pub trait SchemaValidator {
     fn current(&self) -> &Self::SchemaType;
     /// Compare the version of the current schema with the latest schema.
     fn compare_version(&self) -> Result<CompatibilityLevel, EvolutionError>;
+    /// Compare the message header of the current schema with the latest schema.
+    fn compare_message_header(&self) -> Result<CompatibilityLevel, EvolutionError>;
+    /// Compare the types of the current schema with the latest schema.
+    fn compare_types(&self) -> Result<CompatibilityLevel, EvolutionError>;
+    /// Compare the messages of the current schema with the latest schema.
+    fn compare_messages(&self) -> Result<CompatibilityLevel, EvolutionError>;
 }
 
 /// A validator for schema evolution.

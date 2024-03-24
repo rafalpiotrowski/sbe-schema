@@ -35,6 +35,18 @@ pub struct Schema {
     pub messages: Option<Vec<Message>>,
 }
 
+impl Schema {
+    /// Get the message header composite type.
+    pub fn message_header(&self) -> Option<&Composite> {
+        self.types
+            .as_ref()
+            .and_then(
+                |types| types.iter().find_map(
+                    |t| t.composites.as_ref().iter().find_map(
+                        |c| c.iter().find(|c| c.name == "messageHeader"))))
+    }
+}
+
 #[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 #[serde(rename = "include")]
 pub struct Include {
