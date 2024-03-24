@@ -21,14 +21,10 @@ impl<V: SchemaValidator> EvolutionStrategy for FullCompatibility<V> {
         CompatibilityLevel::Full
     }
 
-    fn check(
-        &self,
-        latest_schema: Self::SchemaType,
-        current_schema: Self::SchemaType,
-    ) -> Result<CompatibilityLevel, EvolutionError> {
+    fn check(&self) -> Result<CompatibilityLevel, EvolutionError> {
         let r = self
             .validator
-            .compare_version(&latest_schema, &current_schema)?;
+            .compare_version()?;
         if r == self.compatibility_level() {
             Ok(r)
         } else {

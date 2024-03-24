@@ -41,23 +41,19 @@ pub trait EvolutionStrategy {
     /// The compatibility level of the strategy.
     fn compatibility_level(&self) -> CompatibilityLevel;
     /// Check if the current schema is compatible with the latest schema.
-    fn check(
-        &self,
-        _latest_schema: Self::SchemaType,
-        _current_schema: Self::SchemaType,
-    ) -> Result<CompatibilityLevel, EvolutionError>;
+    fn check(&self) -> Result<CompatibilityLevel, EvolutionError>;
 }
 
 /// A trait for validating schema versions.
 pub trait SchemaValidator {
     /// The type of the schema we will be working against
     type SchemaType;
+    /// Get the latest schema.
+    fn latest(&self) -> &Self::SchemaType;
+    /// Get the current schema.
+    fn current(&self) -> &Self::SchemaType;
     /// Compare the version of the current schema with the latest schema.
-    fn compare_version(
-        &self,
-        _: &Self::SchemaType,
-        _: &Self::SchemaType,
-    ) -> Result<CompatibilityLevel, EvolutionError>;
+    fn compare_version(&self) -> Result<CompatibilityLevel, EvolutionError>;
 }
 
 /// A validator for schema evolution.
@@ -73,12 +69,8 @@ impl<E: EvolutionStrategy> Validator<E> {
     }
 
     /// Check if the current schema is compatible with the latest schema.
-    pub fn check(
-        &self,
-        latest_schema: E::SchemaType,
-        current_schema: E::SchemaType,
-    ) -> Result<CompatibilityLevel, EvolutionError> {
-        self.strategy.check(latest_schema, current_schema)
+    pub fn check(&self) -> Result<CompatibilityLevel, EvolutionError> {
+        self.strategy.check()
     }
 }
 
@@ -103,11 +95,7 @@ impl<V: SchemaValidator> EvolutionStrategy for NoneCompatibility<V> {
         CompatibilityLevel::None
     }
 
-    fn check(
-        &self,
-        _latest_schema: Self::SchemaType,
-        _current_schema: Self::SchemaType,
-    ) -> Result<CompatibilityLevel, EvolutionError> {
+    fn check(&self) -> Result<CompatibilityLevel, EvolutionError> {
         match self.compatibility_level() {
             CompatibilityLevel::None => Ok(CompatibilityLevel::None),
             _ => Err(EvolutionError::SchemaNotCompatible(
@@ -130,11 +118,11 @@ mod tests {
         let latest_schema = Schema::default();
         let current_schema = Schema::default();
         let strategy = NoneCompatibility {
-            _validator: SbeSchemaValidator {},
+            _validator: SbeSchemaValidator::new(latest_schema, current_schema),
         };
 
         let validator = Validator::new(strategy);
-        let result = validator.check(latest_schema, current_schema);
+        let result = validator.check();
         let expected = CompatibilityLevel::None;
         assert!(result.is_ok());
         let returnd_result = result.unwrap();
