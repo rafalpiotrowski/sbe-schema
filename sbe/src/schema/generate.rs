@@ -30,7 +30,7 @@ pub struct GenerateArgs {
     pub jar: Option<PathBuf>,
     /// path to the Java executable, default "java" and uses PATH
     #[arg(long)]
-    pub java: Option<PathBuf>
+    pub java: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -39,7 +39,7 @@ pub enum Language {
     Java,
     Csharp,
     TypeScript,
-    Go
+    Go,
 }
 
 pub fn run(args: GenerateArgs) -> Result<()> {
@@ -47,16 +47,26 @@ pub fn run(args: GenerateArgs) -> Result<()> {
 
     let mut cmd = Command::new(&args.java.unwrap_or("java".into()));
 
-    cmd.arg(format!("-Dsbe.output.dir={0}", &args.output_dir.unwrap_or("generated".into()).to_str().unwrap()))
-        .arg(format!("-Dsbe.xinclude.aware={:?}", &args.xinclude.unwrap_or(true)));
+    cmd.arg(format!(
+        "-Dsbe.output.dir={0}",
+        &args
+            .output_dir
+            .unwrap_or("generated".into())
+            .to_str()
+            .unwrap()
+    ))
+    .arg(format!(
+        "-Dsbe.xinclude.aware={:?}",
+        &args.xinclude.unwrap_or(true)
+    ));
 
     match &args.language {
         Language::Csharp => {
             cmd.arg("-Dsbe.target.language=uk.co.real_logic.sbe.generation.csharp.CSharp");
-        },
+        }
         Language::TypeScript => {
             panic!("TypeScript is not supported yet")
-        },
+        }
         _ => {
             cmd.arg(format!("-Dsbe.target.language={:?}", &args.language));
         }
@@ -70,7 +80,7 @@ pub fn run(args: GenerateArgs) -> Result<()> {
         cmd.arg(format!("-Dsbe.target.namespace={:?}", namespace));
     }
 
-    if let Some(jar) = &args.jar {    
+    if let Some(jar) = &args.jar {
         cmd.arg("-jar").arg(jar);
     } else {
         let version_file = Path::new(crate::tool::SBE_VERSION_FILE);
@@ -83,8 +93,7 @@ pub fn run(args: GenerateArgs) -> Result<()> {
 
     dbg!(&cmd);
 
-    let output = cmd.output()
-        .expect("Unable to execute SBE compiler");
+    let output = cmd.output().expect("Unable to execute SBE compiler");
 
     if !output.status.success() {
         let stderr = std::str::from_utf8(&output.stderr).unwrap();

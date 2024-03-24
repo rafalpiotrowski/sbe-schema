@@ -7,12 +7,10 @@ pub struct FullCompatibility<V: SchemaValidator> {
     validator: V,
 }
 
-impl <V: SchemaValidator> FullCompatibility<V> {
+impl<V: SchemaValidator> FullCompatibility<V> {
     /// Create a new `FullCompatibility` strategy with the given validator.
     pub fn new(validator: V) -> Self {
-        Self {
-            validator
-        }
+        Self { validator }
     }
 }
 
@@ -23,11 +21,20 @@ impl<V: SchemaValidator> EvolutionStrategy for FullCompatibility<V> {
         CompatibilityLevel::Full
     }
 
-    fn check(&self, latest_schema: Self::SchemaType, current_schema: Self::SchemaType) -> Result<(), EvolutionError> {
-        let r = self.validator.compare_version(&latest_schema, &current_schema)?;
-        if r <= 0 {
-            return Err(EvolutionError::SchemaNotCompatible(self.compatibility_level()))
+    fn check(
+        &self,
+        latest_schema: Self::SchemaType,
+        current_schema: Self::SchemaType,
+    ) -> Result<CompatibilityLevel, EvolutionError> {
+        let r = self
+            .validator
+            .compare_version(&latest_schema, &current_schema)?;
+        if r == self.compatibility_level() {
+            Ok(r)
+        } else {
+            Err(EvolutionError::SchemaNotCompatible(
+                self.compatibility_level(),
+            ))
         }
-        Ok(())
     }
 }

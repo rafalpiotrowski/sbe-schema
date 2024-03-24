@@ -1,7 +1,5 @@
-
-use serde_with::skip_serializing_none;
 use serde::{Deserialize, Serialize};
-
+use serde_with::skip_serializing_none;
 
 /// Structure that represent top level SBE schema.
 #[skip_serializing_none]
@@ -212,8 +210,8 @@ pub struct Type {
     pub max_value: Option<String>,
     #[serde(rename = "@minValue")]
     pub min_value: Option<String>,
-    /// A special value that indicates that an optional value is not set. 
-    /// See encodings below for default nullValue for each type. 
+    /// A special value that indicates that an optional value is not set.
+    /// See encodings below for default nullValue for each type.
     /// Mutually exclusive with presence=required and constant.
     #[serde(rename = "@nullValue")]
     pub null_value: Option<String>,
@@ -256,12 +254,12 @@ pub enum PrimitiveType {
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Presence {
-    /// The field has a constant value that need not be transmitted on the wire. 
+    /// The field has a constant value that need not be transmitted on the wire.
     /// Mutually exclusive with nullValue, minValue, and maxValue attributes.
     Constant,
     /// The field must always be set. This is the default presence. Mutually exclusive with nullValue.
     Required,
-    /// The field need not be populated. A special null value indicates that a field is not set. 
+    /// The field need not be populated. A special null value indicates that a field is not set.
     /// The presence attribute may be specified on either on a field or its encoding.
     Optional,
 }
@@ -329,7 +327,10 @@ mod tests {
         dbg!("{:?}", &sbe);
 
         assert_eq!(sbe.byte_order, Some(ByteOrder::LittleEndian));
-        assert_eq!(sbe.semantic_version, SematicVersion(semver::Version::from_str("5.2").unwrap()));
+        assert_eq!(
+            sbe.semantic_version,
+            SematicVersion(semver::Version::from_str("5.2").unwrap())
+        );
 
         let xml = quick_xml::se::to_string(&sbe).expect("Failed to serialize XML");
         dbg!("{:?}", &xml);

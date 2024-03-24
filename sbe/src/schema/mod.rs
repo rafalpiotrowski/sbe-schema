@@ -1,6 +1,6 @@
+mod evolution;
 mod generate;
 mod validate;
-mod evolution;
 
 use anyhow::Result;
 

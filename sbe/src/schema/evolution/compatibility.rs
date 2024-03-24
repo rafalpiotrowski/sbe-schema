@@ -15,7 +15,7 @@ pub struct CompatibilityArgs {
     #[arg(long)]
     pub latest: PathBuf,
     #[arg(long)]
-    pub current: PathBuf,    
+    pub current: PathBuf,
 }
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -27,38 +27,45 @@ pub enum CompatibilityLevel {
 }
 
 pub fn check(args: CompatibilityArgs) -> Result<()> {
-
     match args {
-        CompatibilityArgs { 
+        CompatibilityArgs {
             level: CompatibilityLevel::Backward,
-            latest: _, current: _
-         } => {
+            latest: _,
+            current: _,
+        } => {
             info("Checking backward compatibility")?;
-        },
-        CompatibilityArgs { 
+        }
+        CompatibilityArgs {
             level: CompatibilityLevel::Forward,
-            latest: _, current: _
-         } => {
+            latest: _,
+            current: _,
+        } => {
             info("Checking forward compatibility")?;
-        },
-        CompatibilityArgs { 
+        }
+        CompatibilityArgs {
             level: CompatibilityLevel::Full,
-            latest, current
-         } => {
+            latest,
+            current,
+        } => {
             info("Checking full compatibility")?;
             let latest_schema = latest.try_into()?;
             let current_schema = current.try_into()?;
-            let v = sbe_schema::Validator::new(FullCompatibility::<SbeSchemaValidator>::new(SbeSchemaValidator {}));
+            let v = sbe_schema::Validator::new(FullCompatibility::<SbeSchemaValidator>::new(
+                SbeSchemaValidator {},
+            ));
             v.check(latest_schema, current_schema)?;
-        },
-        CompatibilityArgs { 
+        }
+        CompatibilityArgs {
             level: CompatibilityLevel::None,
-            latest: _, current: _
-         } => {
+            latest: _,
+            current: _,
+        } => {
             info("Checking no compatibility")?;
-            let v = sbe_schema::Validator::new(NoneCompatibility::<SbeSchemaValidator>::new(SbeSchemaValidator{}));
+            let v = sbe_schema::Validator::new(NoneCompatibility::<SbeSchemaValidator>::new(
+                SbeSchemaValidator {},
+            ));
             v.check(sbe_schema::Schema::default(), sbe_schema::Schema::default())?;
-        },
+        }
     }
 
     Ok(())

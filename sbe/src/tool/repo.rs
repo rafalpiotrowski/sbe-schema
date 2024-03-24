@@ -62,7 +62,7 @@ pub fn build() -> Result<()> {
     }
 
     copy_sbe_jar()?;
-    
+
     Ok(())
 }
 

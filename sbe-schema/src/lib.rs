@@ -4,14 +4,17 @@
 //!
 
 mod evolution;
-mod types;
 mod schema;
+mod types;
 
+use evolution::EvolutionError;
 use std::result::Result as StdResult;
 use thiserror::Error;
-use evolution::EvolutionError;
 
-pub use evolution::{CompatibilityLevel, EvolutionStrategy, Validator, NoneCompatibility, FullCompatibility, SbeSchemaValidator, SchemaValidator};
+pub use evolution::{
+    CompatibilityLevel, EvolutionStrategy, FullCompatibility, NoneCompatibility,
+    SbeSchemaValidator, SchemaValidator, Validator,
+};
 pub use types::Schema;
 
 /// Result type returned from methods that have [`enum@self::Error`].
