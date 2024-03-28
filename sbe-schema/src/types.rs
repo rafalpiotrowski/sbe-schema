@@ -1,3 +1,5 @@
+use std::hash::Hash;
+
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
@@ -35,6 +37,22 @@ pub struct Schema {
     pub messages: Option<Vec<Message>>,
 }
 
+impl Hash for Schema {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.package.hash(state);
+        self.id.hash(state);
+        self.version.hash(state);
+        self.semantic_version.hash(state);
+        if self.byte_order.is_some() {
+            self.byte_order.hash(state);
+        }
+        self.types.hash(state);
+        self.messages.hash(state);
+    }
+}
+
+const MESSAGE_HEADER: &str = "messageHeader";
+
 impl Schema {
     /// Get the message header composite type.
     pub fn message_header(&self) -> Option<&Composite> {
@@ -43,8 +61,10 @@ impl Schema {
             .and_then(
                 |types| types.iter().find_map(
                     |t| t.composites.as_ref().iter().find_map(
-                        |c| c.iter().find(|c| c.name == "messageHeader"))))
+                        |c| c.iter().find(|c| c.name == MESSAGE_HEADER))))
     }
+
+    
 }
 
 #[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
@@ -71,6 +91,20 @@ pub struct Message {
     pub semantic_type: Option<String>,
 }
 
+impl Hash for Message {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        // self.name.hash(state); // name might change, protocl will not break since id must remain the same
+        self.id.hash(state);
+        if let Some(fields) = self.fields.as_ref() {
+            fields.iter().for_each(|f| f.hash(state));
+        };
+        if let Some(groups) = self.groups.as_ref() {
+            groups.iter().for_each(|f| f.hash(state));
+        };
+        self.semantic_type.hash(state);
+    }
+}
+
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 pub struct Group {
@@ -90,6 +124,20 @@ pub struct Group {
     pub since_version: Option<u32>,
 }
 
+impl Hash for Group {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+        self.dimension_type.hash(state);
+        if let Some(fields) = self.fields.as_ref() {
+            fields.iter().for_each(|f| f.hash(state));
+        };
+        if let Some(data) = self.data.as_ref() {
+            data.iter().for_each(|f| f.hash(state));
+        };
+        self.since_version.hash(state);
+    }
+}
+
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 pub struct Field {
@@ -103,6 +151,14 @@ pub struct Field {
     pub r#type: String,
     #[serde(rename = "@sinceVersion")]
     pub since_version: Option<u32>,
+}
+
+impl Hash for Field {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+        self.r#type.hash(state);
+        self.since_version.hash(state);
+    }
 }
 
 #[skip_serializing_none]
@@ -120,6 +176,14 @@ pub struct Data {
     pub since_version: Option<u32>,
 }
 
+impl Hash for Data {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+        self.r#type.hash(state);
+        self.since_version.hash(state);
+    }
+}
+
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 pub struct Types {
@@ -129,6 +193,20 @@ pub struct Types {
     pub enums: Option<Vec<EnumType>>,
     #[serde(rename = "set")]
     pub sets: Option<Vec<SetType>>,
+}
+
+impl Hash for Types {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        if let Some(composites) = self.composites.as_ref() {
+            composites.iter().for_each(|f| f.hash(state));
+        };
+        if let Some(enums) = self.enums.as_ref() {
+            enums.iter().for_each(|f| f.hash(state));
+        };
+        if let Some(sets) = self.sets.as_ref() {
+            sets.iter().for_each(|f| f.hash(state));
+        };
+    }
 }
 
 #[skip_serializing_none]
@@ -144,6 +222,18 @@ pub struct EnumType {
     pub valid_values: Option<Vec<ValidValue>>,
 }
 
+impl Hash for EnumType {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        if self.encoding_type.is_some() {
+            self.encoding_type.hash(state);
+        }
+        if let Some(valid_values) = self.valid_values.as_ref() {
+            valid_values.iter().for_each(|f| f.hash(state));
+        };
+    }
+}
+
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 pub struct ValidValue {
@@ -153,6 +243,13 @@ pub struct ValidValue {
     pub description: Option<String>,
     #[serde(rename = "$text")]
     pub value: String,
+}
+
+impl Hash for ValidValue {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.value.hash(state);
+    }
 }
 
 #[skip_serializing_none]
@@ -168,6 +265,18 @@ pub struct SetType {
     pub choices: Option<Vec<Choice>>,
 }
 
+impl Hash for SetType {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        if self.encoding_type.is_some() {
+            self.encoding_type.hash(state);
+        }
+        if let Some(choices) = self.choices.as_ref() {
+            choices.iter().for_each(|f| f.hash(state));
+        };
+    }
+}
+
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 pub struct Choice {
@@ -177,6 +286,13 @@ pub struct Choice {
     pub description: Option<String>,
     #[serde(rename = "$text")]
     pub value: String,
+}
+
+impl Hash for Choice {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.value.hash(state);
+    }
 }
 
 #[skip_serializing_none]
@@ -192,6 +308,18 @@ pub struct Composite {
     pub refs: Option<Vec<Ref>>,
 }
 
+impl Hash for Composite {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        if let Some(types) = self.types.as_ref() {
+            types.iter().for_each(|f| f.hash(state));
+        };
+        if let Some(refs) = self.refs.as_ref() {
+            refs.iter().for_each(|f| f.hash(state));
+        };
+    }
+}
+
 #[skip_serializing_none]
 #[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
 pub struct Ref {
@@ -205,6 +333,19 @@ pub struct Ref {
     pub presence: Option<Presence>,
     #[serde(rename = "@valueRef")]
     pub value_ref: Option<String>,
+}
+
+impl Hash for Ref {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.ref_type.hash(state);
+        if self.presence.is_some() {
+            self.presence.hash(state);
+        }
+        if self.value_ref.is_some() {
+            self.value_ref.hash(state);
+        }
+    }
 }
 
 #[skip_serializing_none]
@@ -237,7 +378,40 @@ pub struct Type {
     pub value: Option<String>,
 }
 
-#[derive(Debug, PartialEq, Deserialize, Serialize)]
+impl Hash for Type {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        if self.primitive_type.is_some() {
+            self.primitive_type.hash(state);
+        }
+        if self.length.is_some() {
+            self.length.hash(state);
+        }
+        if self.max_value.is_some() {
+            self.max_value.hash(state);
+        }
+        if self.min_value.is_some() {
+            self.min_value.hash(state);
+        }
+        if self.null_value.is_some() {
+            self.null_value.hash(state);
+        }
+        if self.character_encoding.is_some() {
+            self.character_encoding.hash(state);
+        }
+        if self.presence.is_some() {
+            self.presence.hash(state);
+        }
+        if self.since_version.is_some() {
+            self.since_version.hash(state);
+        }
+        if self.value.is_some() {
+            self.value.hash(state);
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Deserialize, Serialize, Hash)]
 pub enum PrimitiveType {
     #[serde(rename = "uint8")]
     Uint8,
@@ -263,7 +437,7 @@ pub enum PrimitiveType {
     Double,
 }
 
-#[derive(Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Deserialize, Serialize, Hash)]
 #[serde(rename_all = "camelCase")]
 pub enum Presence {
     /// The field has a constant value that need not be transmitted on the wire.
@@ -276,7 +450,7 @@ pub enum Presence {
     Optional,
 }
 
-#[derive(PartialEq, Deserialize, Serialize)]
+#[derive(PartialEq, Deserialize, Serialize, Hash)]
 pub struct SematicVersion(semver::Version);
 
 impl std::fmt::Debug for SematicVersion {
@@ -291,7 +465,7 @@ impl Default for SematicVersion {
     }
 }
 
-#[derive(Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Deserialize, Serialize, Hash)]
 #[serde(rename_all = "camelCase")]
 pub enum ByteOrder {
     LittleEndian,
@@ -304,6 +478,8 @@ mod tests {
 
     use super::*;
     use quick_xml::de::from_str;
+    use std::hash::Hasher;
+    use std::collections::hash_map::DefaultHasher;
 
     const XML: &str = r#"
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -328,7 +504,7 @@ mod tests {
             </set>            
         </types>
         <sbe:message name="DeprecatedMessage" id="1" semanticType="n/a" description="Message deprecated since version 3" deprecated="3">
-            <field name="v1" id="1" type="uint64" />
+            <field name="v1" id="1" type="uint64" desctription="asdf"/>
         </sbe:message>
     </sbe:messageSchema>
 "#;
@@ -337,6 +513,13 @@ mod tests {
     fn it_works() {
         let sbe: Schema = from_str(XML).expect("Failed to parse XML");
         dbg!("{:?}", &sbe);
+        let mut h = DefaultHasher::new();
+        sbe.hash(&mut h);
+        let hash = h.finish();
+        dbg!("hash {:?}", hash);
+
+        let expected_hash = 9964189947062957224;
+        assert_eq!(hash, expected_hash);
 
         assert_eq!(sbe.byte_order, Some(ByteOrder::LittleEndian));
         assert_eq!(
@@ -344,7 +527,7 @@ mod tests {
             SematicVersion(semver::Version::from_str("5.2").unwrap())
         );
 
-        let xml = quick_xml::se::to_string(&sbe).expect("Failed to serialize XML");
-        dbg!("{:?}", &xml);
+        // let xml = quick_xml::se::to_string(&sbe).expect("Failed to serialize XML");
+        // dbg!("{:?}", &xml);
     }
 }
