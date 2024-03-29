@@ -1,6 +1,6 @@
 //! SBE Schema Validator
 
-use crate::{types::{Composite, Ref, Type}, CompatibilityLevel, EvolutionError, PartialCompatibility, Schema, SchemaValidator, VTable};
+use crate::{types::{Composite, Ref, Type, Presence}, CompatibilityLevel, EvolutionError, PartialCompatibility, Schema, SchemaValidator, VTable};
 
 /// A validator for SBE schema versions.
 pub struct SbeSchemaValidator<'a>
@@ -205,8 +205,22 @@ fn check_types(current: Option<&Vec<Type>>, latest: Option<&Vec<Type>>) -> Compa
 
             level
         },
-        (Some(_), None) => CompatibilityLevel::Full,
-        (None, Some(_)) => return CompatibilityLevel::Backward,
+        // check if the added types are optional. If they are optional then we are backward compatible
+        // otherwise we are forward compatible
+        (Some(types), None) => {
+            types.into_iter().all(
+                |t| t.presence.is_some() && *t.presence.as_ref().unwrap() == Presence::Optional)
+                .then(|| CompatibilityLevel::Backward)
+                .unwrap_or(CompatibilityLevel::Forward)
+        },
+        // check if the removed types were optional. If they were optional then we are Forward compatible,
+        // otherwise Backward
+        (None, Some(types)) => {
+            types.into_iter().all(
+                |t| t.presence.is_some() && *t.presence.as_ref().unwrap() == Presence::Optional)
+                .then(|| CompatibilityLevel::Forward)
+                .unwrap_or(CompatibilityLevel::Backward)
+        },
         (None, None) => CompatibilityLevel::NoChange,
     }
 }
