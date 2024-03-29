@@ -1,9 +1,7 @@
-use std::{cmp::Ordering, collections::HashMap, hash::Hash, result};
+use std::{collections::HashMap, hash::Hash};
 
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
-
-use crate::{CompatibilityLevel, PartialCompatibility};
 
 /// Structure that represent top level SBE schema.
 #[skip_serializing_none]
@@ -72,29 +70,31 @@ const MESSAGE_HEADER: &str = "messageHeader";
 impl Schema {
     /// Get the message header composite type.
     pub fn message_header(&self) -> Option<&Composite> {
-        self.types
-            .as_ref()
-            .and_then(
-                |types| types.iter().find_map(
-                    |t| t.composites.as_ref().iter().find_map(
-                        |c| c.iter().find(|c| c.name == MESSAGE_HEADER))))
+        self.types.as_ref().and_then(|types| {
+            types.iter().find_map(|t| {
+                t.composites
+                    .as_ref()
+                    .iter()
+                    .find_map(|c| c.iter().find(|c| c.name == MESSAGE_HEADER))
+            })
+        })
     }
 }
 
-    /// build vtable for lookups
-    /// type name -> composite/enum/set/type
+/// build vtable for lookups
+/// type name -> composite/enum/set/type
 pub fn build_vtable(schema: &Schema) -> VTable {
-        let mut vtable = VTable::new();
-        if let Some(types) = schema.types.as_ref() {
-            for t in types {
-                if let Some(composites) = t.composites.as_ref() {
-                    for c in composites {
-                        vtable.add(c.name.clone(), VTableObject::Composite(c));
-                    }
+    let mut vtable = VTable::new();
+    if let Some(types) = schema.types.as_ref() {
+        for t in types {
+            if let Some(composites) = t.composites.as_ref() {
+                for c in composites {
+                    vtable.add(c.name.clone(), VTableObject::Composite(c));
                 }
             }
         }
-        vtable
+    }
+    vtable
 }
 
 #[derive(Debug, PartialEq)]
@@ -362,8 +362,7 @@ pub struct ValidValue {
 
 impl PartialEq for ValidValue {
     fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
-            && self.value == other.value
+        self.name == other.name && self.value == other.value
     }
 }
 
@@ -424,8 +423,7 @@ pub struct Choice {
 
 impl PartialEq for Choice {
     fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
-            && self.value == other.value
+        self.name == other.name && self.value == other.value
     }
 }
 
@@ -454,9 +452,7 @@ pub struct Composite {
 impl PartialEq for Composite {
     // compare is two composite are the same, i.e. contain the same list of types and refs
     fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
-            && self.types == other.types
-            && self.refs == other.refs
+        self.name == other.name && self.types == other.types && self.refs == other.refs
     }
 }
 
@@ -659,8 +655,8 @@ mod tests {
 
     use super::*;
     use quick_xml::de::from_str;
-    use std::hash::Hasher;
     use std::collections::hash_map::DefaultHasher;
+    use std::hash::Hasher;
 
     const XML: &str = r#"
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

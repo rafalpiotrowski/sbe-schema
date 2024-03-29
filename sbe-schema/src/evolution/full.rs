@@ -29,10 +29,7 @@ impl<V: SchemaValidator> EvolutionStrategy for FullCompatibility<V> {
     }
 
     fn check(&self) -> Result<CompatibilityLevel, EvolutionError> {
-
-        let r = self
-            .validator
-            .compare_version()?;
+        let r = self.validator.compare_version()?;
         if r == self.compatibility_level() {
             Ok(r)
         } else {

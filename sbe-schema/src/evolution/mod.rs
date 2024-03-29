@@ -4,6 +4,8 @@
 mod backward;
 mod forward;
 mod full;
+mod optional_impl_for_types;
+mod partial_compatibility_for_types;
 mod validator;
 
 use thiserror::Error;
@@ -27,7 +29,7 @@ pub enum CompatibilityLevel {
 }
 
 /// A trait for checking partial compatibility.
-pub trait PartialCompatibility<Rhs = Self> 
+pub trait PartialCompatibility<Rhs = Self>
 where
     Rhs: ?Sized,
 {
@@ -35,12 +37,18 @@ where
     fn partial_compatibility(&self, latest: &Rhs) -> CompatibilityLevel;
 }
 
+/// A trait for checking if type is optional
+pub trait Optional {
+    /// Check if the type is optional.
+    fn is_optional(&self) -> bool;
+}
+
 #[derive(Error, Debug)]
 pub enum EvolutionError {
     #[error("Schema is not compatible with the latest schema! Compatibility level: {0:?}")]
     SchemaNotCompatible(CompatibilityLevel),
     #[error("Missing schema version")]
-    MissingVersion,    
+    MissingVersion,
     #[error("Missing message header")]
     MissingMessageHeader,
 }
