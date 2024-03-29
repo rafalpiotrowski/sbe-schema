@@ -1,11 +1,13 @@
-use std::hash::Hash;
+use std::{cmp::Ordering, collections::HashMap, hash::Hash, result};
 
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
+use crate::{CompatibilityLevel, PartialCompatibility};
+
 /// Structure that represent top level SBE schema.
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 #[serde(rename = "messageSchema")]
 pub struct Schema {
     /// The package name of the schema.
@@ -37,6 +39,20 @@ pub struct Schema {
     pub messages: Option<Vec<Message>>,
 }
 
+impl PartialEq for Schema {
+    fn eq(&self, other: &Self) -> bool {
+        self.package == other.package
+            && self.id == other.id
+            && self.version == other.version
+            && self.semantic_version == other.semantic_version
+            && self.byte_order == other.byte_order
+            && self.types == other.types
+            && self.messages == other.messages
+    }
+}
+
+impl Eq for Schema {}
+
 impl Hash for Schema {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.package.hash(state);
@@ -63,8 +79,50 @@ impl Schema {
                     |t| t.composites.as_ref().iter().find_map(
                         |c| c.iter().find(|c| c.name == MESSAGE_HEADER))))
     }
+}
 
-    
+    /// build vtable for lookups
+    /// type name -> composite/enum/set/type
+pub fn build_vtable(schema: &Schema) -> VTable {
+        let mut vtable = VTable::new();
+        if let Some(types) = schema.types.as_ref() {
+            for t in types {
+                if let Some(composites) = t.composites.as_ref() {
+                    for c in composites {
+                        vtable.add(c.name.clone(), VTableObject::Composite(c));
+                    }
+                }
+            }
+        }
+        vtable
+}
+
+#[derive(Debug, PartialEq)]
+pub enum VTableObject<'a> {
+    Composite(&'a Composite),
+    Enum(&'a EnumType),
+    Set(&'a SetType),
+    Type(&'a Type),
+    Message(&'a Message),
+}
+
+///
+#[derive(Debug, Default, PartialEq)]
+pub struct VTable<'a> {
+    objects: HashMap<String, VTableObject<'a>>,
+}
+
+impl<'a> VTable<'a> {
+    ///
+    pub fn new() -> Self {
+        Self {
+            objects: HashMap::new(),
+        }
+    }
+    ///
+    pub fn add(&mut self, name: String, obj: VTableObject<'a>) {
+        self.objects.insert(name, obj);
+    }
 }
 
 #[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
@@ -75,7 +133,7 @@ pub struct Include {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Message {
     #[serde(rename = "@name")]
     pub name: String,
@@ -90,6 +148,18 @@ pub struct Message {
     #[serde(rename = "semanticType")]
     pub semantic_type: Option<String>,
 }
+
+impl PartialEq for Message {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.id == other.id
+            && self.fields == other.fields
+            && self.groups == other.groups
+            && self.semantic_type == other.semantic_type
+    }
+}
+
+impl Eq for Message {}
 
 impl Hash for Message {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -106,7 +176,7 @@ impl Hash for Message {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Group {
     #[serde(rename = "@name")]
     pub name: String,
@@ -124,6 +194,19 @@ pub struct Group {
     pub since_version: Option<u32>,
 }
 
+impl PartialEq for Group {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.id == other.id
+            && self.dimension_type == other.dimension_type
+            && self.fields == other.fields
+            && self.data == other.data
+            && self.since_version == other.since_version
+    }
+}
+
+impl Eq for Group {}
+
 impl Hash for Group {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.id.hash(state);
@@ -139,7 +222,7 @@ impl Hash for Group {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Field {
     #[serde(rename = "@name")]
     pub name: String,
@@ -153,6 +236,17 @@ pub struct Field {
     pub since_version: Option<u32>,
 }
 
+impl PartialEq for Field {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.id == other.id
+            && self.r#type == other.r#type
+            && self.since_version == other.since_version
+    }
+}
+
+impl Eq for Field {}
+
 impl Hash for Field {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.id.hash(state);
@@ -162,7 +256,7 @@ impl Hash for Field {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Data {
     #[serde(rename = "@name")]
     pub name: String,
@@ -175,6 +269,17 @@ pub struct Data {
     #[serde(rename = "@sinceVersion")]
     pub since_version: Option<u32>,
 }
+
+impl PartialEq for Data {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.id == other.id
+            && self.r#type == other.r#type
+            && self.since_version == other.since_version
+    }
+}
+
+impl Eq for Data {}
 
 impl Hash for Data {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -210,7 +315,7 @@ impl Hash for Types {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct EnumType {
     #[serde(rename = "@name")]
     pub name: String,
@@ -221,6 +326,16 @@ pub struct EnumType {
     #[serde(rename = "validValue")]
     pub valid_values: Option<Vec<ValidValue>>,
 }
+
+impl PartialEq for EnumType {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.encoding_type == other.encoding_type
+            && self.valid_values == other.valid_values
+    }
+}
+
+impl Eq for EnumType {}
 
 impl Hash for EnumType {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -235,7 +350,7 @@ impl Hash for EnumType {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct ValidValue {
     #[serde(rename = "@name")]
     pub name: String,
@@ -245,6 +360,15 @@ pub struct ValidValue {
     pub value: String,
 }
 
+impl PartialEq for ValidValue {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.value == other.value
+    }
+}
+
+impl Eq for ValidValue {}
+
 impl Hash for ValidValue {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.name.hash(state);
@@ -253,7 +377,7 @@ impl Hash for ValidValue {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct SetType {
     #[serde(rename = "@name")]
     pub name: String,
@@ -264,6 +388,16 @@ pub struct SetType {
     #[serde(rename = "choice")]
     pub choices: Option<Vec<Choice>>,
 }
+
+impl PartialEq for SetType {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.encoding_type == other.encoding_type
+            && self.choices == other.choices
+    }
+}
+
+impl Eq for SetType {}
 
 impl Hash for SetType {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -278,7 +412,7 @@ impl Hash for SetType {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Choice {
     #[serde(rename = "@name")]
     pub name: String,
@@ -288,6 +422,15 @@ pub struct Choice {
     pub value: String,
 }
 
+impl PartialEq for Choice {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.value == other.value
+    }
+}
+
+impl Eq for Choice {}
+
 impl Hash for Choice {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.name.hash(state);
@@ -296,7 +439,7 @@ impl Hash for Choice {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Composite {
     #[serde(rename = "@name")]
     pub name: String,
@@ -307,6 +450,17 @@ pub struct Composite {
     #[serde(rename = "ref")]
     pub refs: Option<Vec<Ref>>,
 }
+
+impl PartialEq for Composite {
+    // compare is two composite are the same, i.e. contain the same list of types and refs
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.types == other.types
+            && self.refs == other.refs
+    }
+}
+
+impl Eq for Composite {}
 
 impl Hash for Composite {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -321,7 +475,7 @@ impl Hash for Composite {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Ref {
     #[serde(rename = "@name")]
     pub name: String,
@@ -334,6 +488,17 @@ pub struct Ref {
     #[serde(rename = "@valueRef")]
     pub value_ref: Option<String>,
 }
+
+impl PartialEq for Ref {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.ref_type == other.ref_type
+            && self.value_ref == other.value_ref
+            && self.presence == other.presence
+    }
+}
+
+impl Eq for Ref {}
 
 impl Hash for Ref {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -349,7 +514,7 @@ impl Hash for Ref {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, PartialEq, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Type {
     #[serde(rename = "@name")]
     pub name: String,
@@ -377,6 +542,22 @@ pub struct Type {
     #[serde(rename = "$text")]
     pub value: Option<String>,
 }
+
+impl PartialEq for Type {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+            && self.primitive_type == other.primitive_type
+            && self.length == other.length
+            && self.max_value == other.max_value
+            && self.min_value == other.min_value
+            && self.null_value == other.null_value
+            && self.character_encoding == other.character_encoding
+            && self.since_version == other.since_version
+            && self.value == other.value
+    }
+}
+
+impl Eq for Type {}
 
 impl Hash for Type {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {

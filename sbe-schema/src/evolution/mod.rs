@@ -26,6 +26,15 @@ pub enum CompatibilityLevel {
     NoChange,
 }
 
+/// A trait for checking partial compatibility.
+pub trait PartialCompatibility<Rhs = Self> 
+where
+    Rhs: ?Sized,
+{
+    /// Check the partial compatibility. First argument beeing current version and second argument beeing the latest version.
+    fn partial_compatibility(&self, latest: &Rhs) -> CompatibilityLevel;
+}
+
 #[derive(Error, Debug)]
 pub enum EvolutionError {
     #[error("Schema is not compatible with the latest schema! Compatibility level: {0:?}")]
@@ -126,7 +135,7 @@ mod tests {
         let latest_schema = Schema::default();
         let current_schema = Schema::default();
         let strategy = NoneCompatibility {
-            _validator: SbeSchemaValidator::new(latest_schema, current_schema),
+            _validator: SbeSchemaValidator::new(&latest_schema, &current_schema),
         };
 
         let validator = Validator::new(strategy);

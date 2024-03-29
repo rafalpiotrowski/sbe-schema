@@ -12,10 +12,10 @@ use std::result::Result as StdResult;
 use thiserror::Error;
 
 pub use evolution::{
-    CompatibilityLevel, EvolutionStrategy, FullCompatibility, NoneCompatibility,
+    CompatibilityLevel, PartialCompatibility, EvolutionStrategy, FullCompatibility, NoneCompatibility,
     SbeSchemaValidator, SchemaValidator, Validator,
 };
-pub use types::Schema;
+pub use types::{Schema, VTable, build_vtable};
 
 /// Result type returned from methods that have [`enum@self::Error`].
 pub type Result<T> = StdResult<T, SbeSchemaError>;

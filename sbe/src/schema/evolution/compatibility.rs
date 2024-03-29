@@ -51,7 +51,7 @@ pub fn check(args: CompatibilityArgs) -> Result<()> {
             let latest_schema = latest.try_into()?;
             let current_schema = current.try_into()?;
             let v = sbe_schema::Validator::new(FullCompatibility::<SbeSchemaValidator>::new(
-                SbeSchemaValidator::new(latest_schema, current_schema),
+                SbeSchemaValidator::new(&latest_schema, &current_schema),
             ));
             v.check()?;
         }
@@ -64,7 +64,7 @@ pub fn check(args: CompatibilityArgs) -> Result<()> {
             let latest_schema = latest.try_into()?;
             let current_schema = current.try_into()?;
             let v = sbe_schema::Validator::new(NoneCompatibility::<SbeSchemaValidator>::new(
-                SbeSchemaValidator::new(latest_schema, current_schema),
+                SbeSchemaValidator::new(&latest_schema, &current_schema),
             ));
             v.check()?;
         }
