@@ -13,6 +13,8 @@ use thiserror::Error;
 pub use full::FullCompatibility;
 pub use validator::SbeSchemaValidator;
 
+pub use partial_compatibility_for_types::check_vec;
+
 /// The compatibility level of a schema evolution strategy.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CompatibilityLevel {

@@ -48,7 +48,8 @@ impl PartialCompatibility for Composite {
     }
 }
 
-fn check_vec<T>(current: Option<&Vec<T>>, latest: Option<&Vec<T>>) -> CompatibilityLevel
+/// Check the compatibility of two vectors of types.
+pub fn check_vec<T>(current: Option<&Vec<T>>, latest: Option<&Vec<T>>) -> CompatibilityLevel
 where
     T: PartialEq + Optional,
 {
