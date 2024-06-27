@@ -12,8 +12,8 @@ use std::result::Result as StdResult;
 use thiserror::Error;
 
 pub use evolution::{
-    CompatibilityLevel, EvolutionStrategy, FullCompatibility, NoneCompatibility, Optional,
-    PartialCompatibility, SbeSchemaValidator, SchemaValidator, Validator,
+	CompatibilityLevel, EvolutionStrategy, FullCompatibility, NoneCompatibility, Optional,
+	PartialCompatibility, SbeSchemaValidator, SchemaValidator, Validator,
 };
 pub use types::{build_vtable, Schema, VTable};
 
@@ -23,7 +23,7 @@ pub type Result<T> = StdResult<T, SbeSchemaError>;
 /// Errors that can occur when working with SBE schema files.
 #[derive(Error, Debug)]
 pub enum SbeSchemaError {
-    /// An error occurred while validating schema evolution.
-    #[error(transparent)]
-    Evolution(#[from] EvolutionError),
+	/// An error occurred while validating schema evolution.
+	#[error(transparent)]
+	Evolution(#[from] EvolutionError),
 }

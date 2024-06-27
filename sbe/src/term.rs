@@ -8,9 +8,9 @@ pub use termcolor::Color;
 
 /// Reset stdout
 pub fn reset() -> io::Result<()> {
-    let mut stdout = StandardStream::stdout(ColorChoice::Always);
-    stdout.reset()?;
-    Ok(())
+	let mut stdout = StandardStream::stdout(ColorChoice::Always);
+	stdout.reset()?;
+	Ok(())
 }
 
 /// Write a message
@@ -39,10 +39,10 @@ pub fn reset() -> io::Result<()> {
 
 /// Write a info message
 pub fn info(text: &str) -> io::Result<()> {
-    let mut stdout = StandardStream::stdout(ColorChoice::Always);
-    stdout.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
-    writeln!(&mut stdout, "{text}")?;
-    Ok(())
+	let mut stdout = StandardStream::stdout(ColorChoice::Always);
+	stdout.set_color(ColorSpec::new().set_fg(Some(Color::White)))?;
+	writeln!(&mut stdout, "{text}")?;
+	Ok(())
 }
 
 /// Write a success message
@@ -55,8 +55,8 @@ pub fn info(text: &str) -> io::Result<()> {
 
 /// Write an error message
 pub fn error(text: &str) -> io::Result<()> {
-    let mut stdout = StandardStream::stdout(ColorChoice::Always);
-    stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
-    writeln!(&mut stdout, "{text}")?;
-    Ok(())
+	let mut stdout = StandardStream::stdout(ColorChoice::Always);
+	stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red)))?;
+	writeln!(&mut stdout, "{text}")?;
+	Ok(())
 }
