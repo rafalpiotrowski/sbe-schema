@@ -5,6 +5,7 @@ use git2::{
 };
 use std::{
     cell::RefCell,
+    env,
     io::{self, Write},
     path::{Path, PathBuf},
     process::Command,
@@ -27,11 +28,14 @@ pub fn clean() -> Result<()> {
     rm_repo_folder()?;
 
     let version_file = Path::new(super::SBE_VERSION_FILE);
-    let version = std::fs::read_to_string(version_file)?;
-    let jar = super::SBE_JAR_FORMAT.replace("{version}", &version.trim());
+    if version_file.exists() {
+        tracing::info!("Removing SBE jar and version file");
+        let version = std::fs::read_to_string(version_file)?;
+        let jar = super::SBE_JAR_FORMAT.replace("{version}", &version.trim());
 
-    std::fs::remove_file(version_file)?;
-    std::fs::remove_file(Path::new(jar.as_str()))?;
+        std::fs::remove_file(version_file)?;
+        std::fs::remove_file(Path::new(jar.as_str()))?;
+    }
 
     Ok(())
 }
@@ -94,6 +98,7 @@ pub fn clone() -> Result<()> {
         newline: false,
     });
     let mut cb = RemoteCallbacks::new();
+    cb.credentials(git_credentials_callback);
     cb.transfer_progress(|stats| {
         let mut state = state.borrow_mut();
         state.progress = Some(stats.to_owned());
@@ -119,6 +124,21 @@ pub fn clone() -> Result<()> {
     println!();
 
     Ok(())
+}
+
+fn git_credentials_callback(
+    _user: &str,
+    _user_from_url: Option<&str>,
+    _cred: git2::CredentialType,
+) -> Result<git2::Cred, git2::Error> {
+    let user = _user_from_url.unwrap_or("git");
+
+    git2::Cred::ssh_key(
+        user,
+        None,
+        std::path::Path::new(&format!("{}/.ssh/id_rsa", env::var("HOME").unwrap())),
+        None,
+    )
 }
 
 /// Print progress of the git clone

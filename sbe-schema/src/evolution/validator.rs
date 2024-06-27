@@ -3,28 +3,30 @@
 use core::panic;
 
 use crate::{
-    evolution::check_vec, types::{Composite, EnumType, SetType, Types}, CompatibilityLevel, EvolutionError, PartialCompatibility, Schema, SchemaValidator, VTable
+    evolution::check_vec,
+    types::{Composite, EnumType, SetType, Types},
+    CompatibilityLevel, EvolutionError, PartialCompatibility, Schema, SchemaValidator,
 };
 
 /// A validator for SBE schema versions.
 pub struct SbeSchemaValidator<'a> {
     latest_schema: &'a Schema,
     current_schema: &'a Schema,
-    latest_vtable: VTable<'a>,
-    current_vtable: VTable<'a>,
+    // latest_vtable: VTable<'a>,
+    // current_vtable: VTable<'a>,
 }
 
 impl<'a> SbeSchemaValidator<'a> {
     /// Create a new `SbeSchemaValidator` with the given schemas.
     pub fn new(latest_schema: &'a Schema, current_schema: &'a Schema) -> Self {
-        let latest_vtable = crate::build_vtable(latest_schema);
-        let current_vtable = crate::build_vtable(latest_schema);
+        // let latest_vtable = crate::build_vtable(latest_schema);
+        // let current_vtable = crate::build_vtable(latest_schema);
 
         Self {
             latest_schema,
             current_schema,
-            latest_vtable,
-            current_vtable,
+            // latest_vtable,
+            // current_vtable,
         }
     }
 }
@@ -117,8 +119,11 @@ impl<'a> SchemaValidator for SbeSchemaValidator<'a> {
             (CompatibilityLevel::Full, _, _) => Ok(CompatibilityLevel::Full),
             (_, CompatibilityLevel::Full, _) => Ok(CompatibilityLevel::Full),
             (_, _, CompatibilityLevel::Full) => Ok(CompatibilityLevel::Full),
-            (CompatibilityLevel::NoChange, CompatibilityLevel::NoChange, CompatibilityLevel::NoChange) => 
-                Ok(CompatibilityLevel::NoChange),
+            (
+                CompatibilityLevel::NoChange,
+                CompatibilityLevel::NoChange,
+                CompatibilityLevel::NoChange,
+            ) => Ok(CompatibilityLevel::NoChange),
         }
     }
 
@@ -135,21 +140,28 @@ fn flat_types(types: Option<&Vec<Types>>) -> FlatTypes {
     };
 
     if let Some(types) = types {
-        flat_types.composites = Some(types
-            .iter()
-            .filter(|t| t.composites.is_some())
-            .flat_map(|t| t.composites.as_ref().unwrap())
-            .filter(|c| c.name != "messageHeader").collect::<Vec<_>>());
-        flat_types.enums = Some(types
-            .iter()
-            .filter(|t| t.enums.is_some())
-            .flat_map(|t| t.enums.as_ref().unwrap())
-            .collect::<Vec<_>>());
-        flat_types.sets = Some(types
-            .iter()
-            .filter(|t| t.sets.is_some())
-            .flat_map(|t| t.sets.as_ref().unwrap())
-            .collect::<Vec<_>>());
+        flat_types.composites = Some(
+            types
+                .iter()
+                .filter(|t| t.composites.is_some())
+                .flat_map(|t| t.composites.as_ref().unwrap())
+                .filter(|c| c.name != "messageHeader")
+                .collect::<Vec<_>>(),
+        );
+        flat_types.enums = Some(
+            types
+                .iter()
+                .filter(|t| t.enums.is_some())
+                .flat_map(|t| t.enums.as_ref().unwrap())
+                .collect::<Vec<_>>(),
+        );
+        flat_types.sets = Some(
+            types
+                .iter()
+                .filter(|t| t.sets.is_some())
+                .flat_map(|t| t.sets.as_ref().unwrap())
+                .collect::<Vec<_>>(),
+        );
     }
 
     flat_types

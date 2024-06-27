@@ -1,21 +1,22 @@
 [workspace]
-members = [
-  "sbe",
-  "sbe-schema",
-]
+members = ["sbe", "sbe-schema"]
 resolver = "2"
 
 [workspace.dependencies]
 anyhow = "1.0"
 clap = { version = "4.5", features = ["derive"] }
 thiserror = "1.0"
-quick-xml = { version = "0.31", features = ["serialize"] }
+quick-xml = { version = "0.34", features = ["serialize"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_with = "3.7"
-semver = { version = "1.0.23", features = ["serde"], git = "https://github.com/rafalpiotrowski/semver.git" , branch = "allow_missing_minor_patch"}
+semver = { version = "1.0.23", features = [
+  "serde",
+], git = "https://github.com/rafalpiotrowski/semver.git", branch = "allow_missing_minor_patch" }
 termcolor = "1.4"
 exitcode = "1.1"
-git2 = "0.18"
+git2 = "0.19"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [profile.release]
 debug = true

@@ -20,44 +20,52 @@ mod tool;
 
 use clap::{command, Parser, Subcommand};
 
+use tracing_subscriber::prelude::*;
+use tracing_subscriber::{fmt, EnvFilter};
+
 #[derive(Parser)]
 #[command(author, version, about = "SBE schema tool", long_about = None, propagate_version = true)]
 struct Cli {
-    #[command(subcommand)]
-    command: Commands,
+	#[command(subcommand)]
+	command: Commands,
 }
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Work with SBE schema files: validate and generate code for different languages
-    #[command(subcommand)]
-    Schema(schema::Commands),
-    /// Work with SBE source code. Clone, build, and copy jar file for later use in code generation and schema validation.
-    /// Requires to have java installed and available in the PATH or specify the path to the java executable.
-    #[command(subcommand)]
-    Tool(tool::Commands),
+	/// Work with SBE schema files: validate and generate code for different languages
+	#[command(subcommand)]
+	Schema(schema::Commands),
+	/// Work with SBE source code. Clone, build, and copy jar file for later use in code generation and schema validation.
+	/// Requires to have java installed and available in the PATH or specify the path to the java executable.
+	#[command(subcommand)]
+	Tool(tool::Commands),
 }
 
 fn main() {
-    let cli = Cli::parse();
+	tracing_subscriber::registry()
+		.with(fmt::layer())
+		.with(EnvFilter::from_default_env())
+		.init();
 
-    let result = match cli.command {
-        Commands::Schema(args) => schema::handle(args),
-        Commands::Tool(args) => tool::handle(args),
-    };
+	let cli = Cli::parse();
 
-    if let Err(e) = &result {
-        if term::error(&format!("{e}")).is_err() {
-            // if we can't color the error message, just eprint it
-            eprintln!("{e}");
-        }
-    }
+	let result = match cli.command {
+		Commands::Schema(args) => schema::handle(args),
+		Commands::Tool(args) => tool::handle(args),
+	};
 
-    // reset terminal colors
-    _ = term::reset();
+	if let Err(e) = &result {
+		if term::error(&format!("{e}")).is_err() {
+			// if we can't color the error message, just eprint it
+			eprintln!("{e}");
+		}
+	}
 
-    match result {
-        Ok(_) => std::process::exit(exitcode::OK),
-        Err(_) => std::process::exit(exitcode::DATAERR),
-    }
+	// reset terminal colors
+	_ = term::reset();
+
+	match result {
+		Ok(_) => std::process::exit(exitcode::OK),
+		Err(_) => std::process::exit(exitcode::DATAERR),
+	}
 }
