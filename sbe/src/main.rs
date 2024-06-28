@@ -20,9 +20,6 @@ mod tool;
 
 use clap::{command, Parser, Subcommand};
 
-use tracing_subscriber::prelude::*;
-use tracing_subscriber::{fmt, EnvFilter};
-
 #[derive(Parser)]
 #[command(author, version, about = "SBE schema tool", long_about = None, propagate_version = true)]
 struct Cli {
@@ -42,11 +39,6 @@ enum Commands {
 }
 
 fn main() {
-	tracing_subscriber::registry()
-		.with(fmt::layer())
-		.with(EnvFilter::from_default_env())
-		.init();
-
 	let cli = Cli::parse();
 
 	let result = match cli.command {

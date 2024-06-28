@@ -15,8 +15,6 @@ semver = { version = "1.0.23", features = [
 termcolor = "1.4"
 exitcode = "1.1"
 git2 = "0.19"
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [profile.release]
 debug = true

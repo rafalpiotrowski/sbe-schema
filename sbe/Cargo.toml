@@ -12,8 +12,6 @@ termcolor = { workspace = true }
 exitcode = { workspace = true }
 git2 = { workspace = true }
 sbe-schema = { version = "0.1.0", path = "../sbe-schema" }
-tracing = { workspace = true }
-tracing-subscriber = { workspace = true }
 
 [lints]
 workspace = true

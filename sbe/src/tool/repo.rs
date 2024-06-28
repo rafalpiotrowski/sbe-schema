@@ -1,3 +1,4 @@
+use crate::term::info;
 use anyhow::{bail, Result};
 use git2::{
 	build::{CheckoutBuilder, RepoBuilder},
@@ -29,7 +30,7 @@ pub fn clean() -> Result<()> {
 
 	let version_file = Path::new(super::SBE_VERSION_FILE);
 	if version_file.exists() {
-		tracing::info!("Removing SBE jar and version file");
+		info("Removing SBE jar and version file")?;
 		let version = std::fs::read_to_string(version_file)?;
 		let jar = super::SBE_JAR_FORMAT.replace("{version}", &version.trim());
 
