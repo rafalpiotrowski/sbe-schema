@@ -44,7 +44,7 @@ impl<'a> SchemaValidator for SbeSchemaValidator<'a> {
 
 	fn compare_version(&self) -> Result<CompatibilityLevel, EvolutionError> {
 		match (self.latest().version, self.current().version) {
-			(Some(latest), Some(current)) => {
+			(latest, current) => {
 				if current == latest {
 					Ok(CompatibilityLevel::NoChange)
 				} else if current > latest {
@@ -58,7 +58,6 @@ impl<'a> SchemaValidator for SbeSchemaValidator<'a> {
 					Ok(CompatibilityLevel::None)
 				}
 			},
-			_ => Err(EvolutionError::MissingVersion),
 		}
 	}
 

@@ -16,7 +16,7 @@ pub struct Schema {
 	pub id: i32,
 	/// The version of the schema.
 	#[serde(rename = "@version")]
-	pub version: Option<u32>,
+	pub version: u32,
 	/// The semantic version of the schema.
 	#[serde(rename = "@semanticVersion")]
 	pub semantic_version: SematicVersion,
