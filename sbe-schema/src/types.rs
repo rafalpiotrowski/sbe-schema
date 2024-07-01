@@ -10,20 +10,23 @@ use serde_with::skip_serializing_none;
 pub struct Schema {
 	/// The package name of the schema.
 	#[serde(rename = "@package")]
-	pub package: String,
+	pub package: Option<String>,
 	/// The id of the schema.
 	#[serde(rename = "@id")]
-	pub id: i32,
+	pub id: Option<i32>,
 	/// The version of the schema.
 	#[serde(rename = "@version")]
 	pub version: u32,
 	/// The semantic version of the schema.
 	#[serde(rename = "@semanticVersion")]
-	pub semantic_version: SematicVersion,
+	pub semantic_version: Option<SematicVersion>,
 	/// The description of the schema.
 	#[serde(rename = "@description")]
-	pub description: String,
+	pub description: Option<String>,
 	/// The byte order of the bytes.
+	/// default to littleEndian
+	/// but we need to know if it was set or not
+	/// therefore use of Option
 	#[serde(rename = "@byteOrder")]
 	pub byte_order: Option<ByteOrder>,
 	/// The include section of the schema.
@@ -35,6 +38,11 @@ pub struct Schema {
 	/// The messages of the schema.
 	#[serde(rename = "message")]
 	pub messages: Option<Vec<Message>>,
+	/// header type name
+	/// default to "messageHeader" but we need to know if it was set or not
+	/// therefore use of Option
+	#[serde(rename = "headerType")]
+	pub header_type: Option<String>,
 }
 
 impl PartialEq for Schema {
@@ -53,19 +61,32 @@ impl Eq for Schema {}
 
 impl Hash for Schema {
 	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-		self.package.hash(state);
-		self.id.hash(state);
+		if self.package.is_some() {
+			self.package.hash(state);
+		}
+		if self.id.is_some() {
+			self.id.hash(state);
+		}
 		self.version.hash(state);
-		self.semantic_version.hash(state);
+		if self.semantic_version.is_some() {
+			self.semantic_version.hash(state);
+		}
 		if self.byte_order.is_some() {
 			self.byte_order.hash(state);
 		}
-		self.types.hash(state);
-		self.messages.hash(state);
+		if self.types.is_some() {
+			self.types.hash(state);
+		}
+		if self.messages.is_some() {
+			self.messages.hash(state);
+		}
+		if self.header_type.is_some() {
+			self.header_type.hash(state);
+		}
 	}
 }
 
-const MESSAGE_HEADER: &str = "messageHeader";
+const DEFAULT_HEADER_TYPE: &str = "messageHeader";
 
 impl Schema {
 	/// Get the message header composite type.
@@ -75,7 +96,7 @@ impl Schema {
 				t.composites
 					.as_ref()
 					.iter()
-					.find_map(|c| c.iter().find(|c| c.name == MESSAGE_HEADER))
+					.find_map(|c| c.iter().find(|c| c.name == DEFAULT_HEADER_TYPE))
 			})
 		})
 	}
@@ -647,6 +668,12 @@ pub enum ByteOrder {
 	BigEndian,
 }
 
+impl Default for ByteOrder {
+	fn default() -> Self {
+		ByteOrder::LittleEndian
+	}
+}
+
 #[cfg(test)]
 mod tests {
 	use std::str::FromStr;
@@ -691,13 +718,16 @@ mod tests {
 		let mut h = DefaultHasher::new();
 		sbe.hash(&mut h);
 		let hash = h.finish();
-		dbg!("hash {:?}", hash);
+		dbg!(hash);
 
-		let expected_hash = 9964189947062957224;
+		let expected_hash = 15732360995906542288;
 		assert_eq!(hash, expected_hash);
 
 		assert_eq!(sbe.byte_order, Some(ByteOrder::LittleEndian));
-		assert_eq!(sbe.semantic_version, SematicVersion(semver::Version::from_str("5.2").unwrap()));
+		assert_eq!(
+			sbe.semantic_version,
+			Some(SematicVersion(semver::Version::from_str("5.2").unwrap()))
+		);
 
 		// let xml = quick_xml::se::to_string(&sbe).expect("Failed to serialize XML");
 		// dbg!("{:?}", &xml);
