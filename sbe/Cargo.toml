@@ -9,7 +9,7 @@ license = "Apache-2.0 OR MIT"
 description = "sbe schema tool to facilitate working with SBE schema files and generating codes"
 readme = "../README.md"
 repository = "https://github.com/rafalpiotrowski/sbe-schema"
-keywords = [ "sbe", "simple-binary-encoding", "sbe-schema", "aeron", "encoding" ]
+keywords = [ "sbe", "simple-binary", "encoding", "sbe-schema", "aeron" ]
 categories = [ "command-line-utilities", "development-tools", "code-generation", "tools", "utility" ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
