@@ -1,3 +1,5 @@
+//!
+//! Schema evolution handling commands
 mod evolution;
 mod generate;
 mod validate;

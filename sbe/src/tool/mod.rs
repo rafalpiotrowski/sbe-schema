@@ -12,7 +12,8 @@ pub enum Commands {
 	Build,
 	/// removed .simple-binary-encoding directory and SBE jar
 	Clean,
-	/// copy the SBE jar to the current directory, build will do it but we can do it manually as well
+	/// copy the SBE jar to the current directory, build will do it but we can do it manually as
+	/// well
 	CopyJar,
 }
 

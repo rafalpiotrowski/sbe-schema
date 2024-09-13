@@ -6,7 +6,7 @@ use sbe_schema::{FullCompatibility, NoneCompatibility, SbeSchemaValidator, Valid
 
 use crate::term::info;
 
-///
+/// Check compatibility between two SBE schemas.
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 pub struct CompatibilityArgs {

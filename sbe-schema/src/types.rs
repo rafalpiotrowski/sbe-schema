@@ -1,3 +1,4 @@
+//! Types that represent the SBE schema.
 use std::{collections::HashMap, hash::Hash};
 
 use serde::{Deserialize, Serialize};
@@ -47,13 +48,13 @@ pub struct Schema {
 
 impl PartialEq for Schema {
 	fn eq(&self, other: &Self) -> bool {
-		self.package == other.package
-			&& self.id == other.id
-			&& self.version == other.version
-			&& self.semantic_version == other.semantic_version
-			&& self.byte_order == other.byte_order
-			&& self.types == other.types
-			&& self.messages == other.messages
+		self.package == other.package &&
+			self.id == other.id &&
+			self.version == other.version &&
+			self.semantic_version == other.semantic_version &&
+			self.byte_order == other.byte_order &&
+			self.types == other.types &&
+			self.messages == other.messages
 	}
 }
 
@@ -127,18 +128,18 @@ pub enum VTableObject<'a> {
 	Message(&'a Message),
 }
 
-///
+/// VTable for lookups
 #[derive(Debug, Default, PartialEq)]
 pub struct VTable<'a> {
 	objects: HashMap<String, VTableObject<'a>>,
 }
 
 impl<'a> VTable<'a> {
-	///
+	/// Create a new VTable
 	pub fn new() -> Self {
 		Self { objects: HashMap::new() }
 	}
-	///
+	/// Add object to the vtable
 	pub fn add(&mut self, name: String, obj: VTableObject<'a>) {
 		self.objects.insert(name, obj);
 	}
@@ -170,11 +171,11 @@ pub struct Message {
 
 impl PartialEq for Message {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name
-			&& self.id == other.id
-			&& self.fields == other.fields
-			&& self.groups == other.groups
-			&& self.semantic_type == other.semantic_type
+		self.name == other.name &&
+			self.id == other.id &&
+			self.fields == other.fields &&
+			self.groups == other.groups &&
+			self.semantic_type == other.semantic_type
 	}
 }
 
@@ -182,7 +183,8 @@ impl Eq for Message {}
 
 impl Hash for Message {
 	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-		// self.name.hash(state); // name might change, protocl will not break since id must remain the same
+		// self.name.hash(state); // name might change, protocl will not break since id must remain
+		// the same
 		self.id.hash(state);
 		if let Some(fields) = self.fields.as_ref() {
 			fields.iter().for_each(|f| f.hash(state));
@@ -215,12 +217,12 @@ pub struct Group {
 
 impl PartialEq for Group {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name
-			&& self.id == other.id
-			&& self.dimension_type == other.dimension_type
-			&& self.fields == other.fields
-			&& self.data == other.data
-			&& self.since_version == other.since_version
+		self.name == other.name &&
+			self.id == other.id &&
+			self.dimension_type == other.dimension_type &&
+			self.fields == other.fields &&
+			self.data == other.data &&
+			self.since_version == other.since_version
 	}
 }
 
@@ -257,10 +259,10 @@ pub struct Field {
 
 impl PartialEq for Field {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name
-			&& self.id == other.id
-			&& self.r#type == other.r#type
-			&& self.since_version == other.since_version
+		self.name == other.name &&
+			self.id == other.id &&
+			self.r#type == other.r#type &&
+			self.since_version == other.since_version
 	}
 }
 
@@ -291,10 +293,10 @@ pub struct Data {
 
 impl PartialEq for Data {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name
-			&& self.id == other.id
-			&& self.r#type == other.r#type
-			&& self.since_version == other.since_version
+		self.name == other.name &&
+			self.id == other.id &&
+			self.r#type == other.r#type &&
+			self.since_version == other.since_version
 	}
 }
 
@@ -348,9 +350,9 @@ pub struct EnumType {
 
 impl PartialEq for EnumType {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name
-			&& self.encoding_type == other.encoding_type
-			&& self.valid_values == other.valid_values
+		self.name == other.name &&
+			self.encoding_type == other.encoding_type &&
+			self.valid_values == other.valid_values
 	}
 }
 
@@ -409,9 +411,9 @@ pub struct SetType {
 
 impl PartialEq for SetType {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name
-			&& self.encoding_type == other.encoding_type
-			&& self.choices == other.choices
+		self.name == other.name &&
+			self.encoding_type == other.encoding_type &&
+			self.choices == other.choices
 	}
 }
 
@@ -506,10 +508,10 @@ pub struct Ref {
 
 impl PartialEq for Ref {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name
-			&& self.ref_type == other.ref_type
-			&& self.value_ref == other.value_ref
-			&& self.presence == other.presence
+		self.name == other.name &&
+			self.ref_type == other.ref_type &&
+			self.value_ref == other.value_ref &&
+			self.presence == other.presence
 	}
 }
 
@@ -560,15 +562,15 @@ pub struct Type {
 
 impl PartialEq for Type {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name
-			&& self.primitive_type == other.primitive_type
-			&& self.length == other.length
-			&& self.max_value == other.max_value
-			&& self.min_value == other.min_value
-			&& self.null_value == other.null_value
-			&& self.character_encoding == other.character_encoding
-			&& self.since_version == other.since_version
-			&& self.value == other.value
+		self.name == other.name &&
+			self.primitive_type == other.primitive_type &&
+			self.length == other.length &&
+			self.max_value == other.max_value &&
+			self.min_value == other.min_value &&
+			self.null_value == other.null_value &&
+			self.character_encoding == other.character_encoding &&
+			self.since_version == other.since_version &&
+			self.value == other.value
 	}
 }
 
@@ -639,7 +641,8 @@ pub enum Presence {
 	/// The field has a constant value that need not be transmitted on the wire.
 	/// Mutually exclusive with nullValue, minValue, and maxValue attributes.
 	Constant,
-	/// The field must always be set. This is the default presence. Mutually exclusive with nullValue.
+	/// The field must always be set. This is the default presence. Mutually exclusive with
+	/// nullValue.
 	Required,
 	/// The field need not be populated. A special null value indicates that a field is not set.
 	/// The presence attribute may be specified on either on a field or its encoding.
@@ -661,17 +664,12 @@ impl Default for SematicVersion {
 	}
 }
 
-#[derive(Debug, PartialEq, Deserialize, Serialize, Hash)]
+#[derive(Debug, Default, PartialEq, Deserialize, Serialize, Hash)]
 #[serde(rename_all = "camelCase")]
 pub enum ByteOrder {
+	#[default]
 	LittleEndian,
 	BigEndian,
-}
-
-impl Default for ByteOrder {
-	fn default() -> Self {
-		ByteOrder::LittleEndian
-	}
 }
 
 #[cfg(test)]
@@ -680,8 +678,7 @@ mod tests {
 
 	use super::*;
 	use quick_xml::de::from_str;
-	use std::collections::hash_map::DefaultHasher;
-	use std::hash::Hasher;
+	use std::{collections::hash_map::DefaultHasher, hash::Hasher};
 
 	const XML: &str = r#"
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

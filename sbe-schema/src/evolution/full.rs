@@ -3,7 +3,6 @@
 //! Allowed:
 //! - Add optional fields to messages
 //! - Delete optional fields
-//!
 
 use crate::{CompatibilityLevel, EvolutionStrategy};
 

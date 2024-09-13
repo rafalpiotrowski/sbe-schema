@@ -13,7 +13,6 @@
 //! ```shell
 //! sbe schema generate -l rust -f schema.xml
 //! ```
-//!
 mod schema;
 mod term;
 mod tool;
@@ -32,8 +31,9 @@ enum Commands {
 	/// Work with SBE schema files: validate and generate code for different languages
 	#[command(subcommand)]
 	Schema(schema::Commands),
-	/// Work with SBE source code. Clone, build, and copy jar file for later use in code generation and schema validation.
-	/// Requires to have java installed and available in the PATH or specify the path to the java executable.
+	/// Work with SBE source code. Clone, build, and copy jar file for later use in code generation
+	/// and schema validation. Requires to have java installed and available in the PATH or
+	/// specify the path to the java executable.
 	#[command(subcommand)]
 	Tool(tool::Commands),
 }

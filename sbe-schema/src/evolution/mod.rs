@@ -1,5 +1,4 @@
-//!
-//!
+//! This module contains the implementation of the schema evolution strategy.
 
 mod backward;
 mod forward;
@@ -35,7 +34,8 @@ pub trait PartialCompatibility<Rhs = Self>
 where
 	Rhs: ?Sized,
 {
-	/// Check the partial compatibility. First argument beeing current version and second argument beeing the latest version.
+	/// Check the partial compatibility. First argument beeing current version and second argument
+	/// beeing the latest version.
 	fn partial_compatibility(&self, latest: &Rhs) -> CompatibilityLevel;
 }
 

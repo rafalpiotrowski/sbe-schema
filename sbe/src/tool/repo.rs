@@ -32,7 +32,7 @@ pub fn clean() -> Result<()> {
 	if version_file.exists() {
 		info("Removing SBE jar and version file")?;
 		let version = std::fs::read_to_string(version_file)?;
-		let jar = super::SBE_JAR_FORMAT.replace("{version}", &version.trim());
+		let jar = super::SBE_JAR_FORMAT.replace("{version}", version.trim());
 
 		std::fs::remove_file(version_file)?;
 		std::fs::remove_file(Path::new(jar.as_str()))?;
@@ -75,7 +75,7 @@ pub fn build() -> Result<()> {
 pub fn copy_sbe_jar() -> Result<()> {
 	let version_file = Path::new(CHECKOUT_DIR).join(SBE_VERSION_FILE);
 	let version = std::fs::read_to_string(version_file.clone())?;
-	let jar = super::SBE_JAR_FORMAT.replace("{version}", &version.trim());
+	let jar = super::SBE_JAR_FORMAT.replace("{version}", version.trim());
 	let src = Path::new(CHECKOUT_DIR).join("sbe-all").join("build").join("libs").join(&jar);
 
 	let dst = Path::new(&jar);
@@ -94,7 +94,7 @@ pub fn clone() -> Result<()> {
 	cb.transfer_progress(|stats| {
 		let mut state = state.borrow_mut();
 		state.progress = Some(stats.to_owned());
-		print(&mut *state);
+		print(&mut state);
 		true
 	});
 
@@ -104,7 +104,7 @@ pub fn clone() -> Result<()> {
 		state.path = path.map(|p| p.to_path_buf());
 		state.current = cur;
 		state.total = total;
-		print(&mut *state);
+		print(&mut state);
 	});
 
 	let mut fo = FetchOptions::new();

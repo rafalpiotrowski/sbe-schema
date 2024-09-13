@@ -1,3 +1,10 @@
+[![Crates.io](https://img.shields.io/crates/v/sbe-schema)](https://crates.io/crates/sbe-schema)
+[![minimum rustc version](https://img.shields.io/badge/rustc-1.64+-green.svg)](https://blog.rust-lang.org/2019/11/07/Rust-1.64.0.html)
+
+Master 
+[![Build Status](https://github.com/rafalpiotrowski/sbe-schema/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/rafalpiotrowski/sbe-schema)
+
+
 # Simple Binary Encoding (SBE) Schema
 
 SBE stands for Simple Binary Encoding. You can read more about it here: [SBE](https://github.com/real-logic/simple-binary-encoding)

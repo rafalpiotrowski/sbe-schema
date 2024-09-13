@@ -35,29 +35,24 @@ impl<'a> SchemaValidator for SbeSchemaValidator<'a> {
 	type SchemaType = Schema;
 
 	fn latest(&self) -> &Self::SchemaType {
-		&self.latest_schema
+		self.latest_schema
 	}
 
 	fn current(&self) -> &Self::SchemaType {
-		&self.current_schema
+		self.current_schema
 	}
 
 	fn compare_version(&self) -> Result<CompatibilityLevel, EvolutionError> {
-		match (self.latest().version, self.current().version) {
-			(latest, current) => {
-				if current == latest {
-					Ok(CompatibilityLevel::NoChange)
-				} else if current > latest {
-					if current - latest == 1 {
-						Ok(CompatibilityLevel::Full)
-					} else {
-						Ok(CompatibilityLevel::None)
-					}
+		let (latest, current) = (self.latest().version, self.current().version);
+		match current.cmp(&latest) {
+			std::cmp::Ordering::Less => Ok(CompatibilityLevel::None),
+			std::cmp::Ordering::Equal => Ok(CompatibilityLevel::NoChange),
+			std::cmp::Ordering::Greater =>
+				if current - latest == 1 {
+					Ok(CompatibilityLevel::Full)
 				} else {
-					// current < latest
 					Ok(CompatibilityLevel::None)
-				}
-			},
+				},
 		}
 	}
 
@@ -66,9 +61,8 @@ impl<'a> SchemaValidator for SbeSchemaValidator<'a> {
 		let current = self.current().message_header();
 
 		match (latest, current) {
-			(Some(latest), Some(current)) => {
-				Ok(PartialCompatibility::partial_compatibility(current, latest))
-			},
+			(Some(latest), Some(current)) =>
+				Ok(PartialCompatibility::partial_compatibility(current, latest)),
 			// SBE requires message header to be defined
 			_ => Err(EvolutionError::MissingMessageHeader),
 		}

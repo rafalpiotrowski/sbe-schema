@@ -25,7 +25,8 @@ pub struct GenerateArgs {
 	/// target language for generated code
 	#[arg(long, short, value_enum)]
 	pub language: Language,
-	/// path to the SBE jar file, default uses the version in the SBE_VERSION file and current working directory
+	/// path to the SBE jar file, default uses the version in the SBE_VERSION file and current
+	/// working directory
 	#[arg(long, short)]
 	pub jar: Option<PathBuf>,
 	/// path to the Java executable, default "java" and uses PATH
@@ -48,7 +49,7 @@ const DEFAULT_SBE_XINCLUDE_FLAG: bool = true;
 pub fn run(args: GenerateArgs) -> Result<()> {
 	dbg!(&args);
 
-	let mut cmd = Command::new(&args.java.unwrap_or("java".into()));
+	let mut cmd = Command::new(args.java.unwrap_or("java".into()));
 
 	cmd.arg(format!(
 		"-Dsbe.output.dir={0}",
@@ -81,7 +82,7 @@ pub fn run(args: GenerateArgs) -> Result<()> {
 	} else {
 		let version_file = Path::new(crate::tool::SBE_VERSION_FILE);
 		let version = std::fs::read_to_string(version_file)?;
-		let jar_file = crate::tool::SBE_JAR_FORMAT.replace("{version}", &version.trim());
+		let jar_file = crate::tool::SBE_JAR_FORMAT.replace("{version}", version.trim());
 		cmd.arg("-jar").arg(jar_file);
 	}
 

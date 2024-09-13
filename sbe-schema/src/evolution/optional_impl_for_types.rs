@@ -1,5 +1,7 @@
-use crate::evolution::Optional;
-use crate::types::{Composite, EnumType, Presence, Ref, SetType, Type};
+use crate::{
+	evolution::Optional,
+	types::{Composite, EnumType, Presence, Ref, SetType, Type},
+};
 
 impl Optional for Type {
 	fn is_optional(&self) -> bool {
