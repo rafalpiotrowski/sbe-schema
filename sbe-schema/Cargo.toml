@@ -10,7 +10,7 @@ description = "sbe schema library"
 readme = "../README.md"
 repository = "https://github.com/rafalpiotrowski/sbe-schema"
 keywords = [ "sbe", "simple-binary", "aeron", "encoding", "serialization" ]
-categories = [ "development-lib", "code-generation", "lib", "library" ]
+categories = [ "parsing", "parser-implementations", "development-tools" ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
