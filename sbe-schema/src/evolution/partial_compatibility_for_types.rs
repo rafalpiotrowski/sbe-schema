@@ -23,12 +23,13 @@ impl PartialCompatibility for Composite {
 		level = check_vec::<Type>(self.types.as_ref(), latest.types.as_ref());
 		let ref_level = match level {
 			CompatibilityLevel::None => return level,
-			_ =>
+			_ => {
 				if self.refs == latest.refs {
 					CompatibilityLevel::NoChange
 				} else {
 					check_vec::<Ref>(self.refs.as_ref(), latest.refs.as_ref())
-				},
+				}
+			},
 		};
 
 		match (level, ref_level) {
@@ -40,8 +41,9 @@ impl PartialCompatibility for Composite {
 			(_, CompatibilityLevel::Full) => level,
 			(_, CompatibilityLevel::Backward) => CompatibilityLevel::Backward,
 			(CompatibilityLevel::Backward, _) => CompatibilityLevel::Backward,
-			(CompatibilityLevel::Forward, CompatibilityLevel::Forward) =>
-				CompatibilityLevel::Forward,
+			(CompatibilityLevel::Forward, CompatibilityLevel::Forward) => {
+				CompatibilityLevel::Forward
+			},
 		}
 	}
 }
@@ -113,20 +115,22 @@ where
 		},
 		// check if the added types are optional. If they are optional then we are backward
 		// compatible otherwise we are forward compatible
-		(Some(current_items), None) =>
+		(Some(current_items), None) => {
 			if current_items.iter().all(|t| t.is_optional()) {
 				CompatibilityLevel::Backward
 			} else {
 				CompatibilityLevel::Forward
-			},
+			}
+		},
 		// check if the removed types were optional. If they were optional then we are Forward
 		// compatible, otherwise Backward
-		(None, Some(latest_items)) =>
+		(None, Some(latest_items)) => {
 			if latest_items.iter().all(|t| t.is_optional()) {
 				CompatibilityLevel::Forward
 			} else {
 				CompatibilityLevel::Backward
-			},
+			}
+		},
 		(None, None) => CompatibilityLevel::NoChange,
 	}
 }

@@ -138,6 +138,8 @@ fn print(state: &mut State) {
 	let stats = state.progress.as_ref().unwrap();
 	let network_pct = (100 * stats.received_objects()) / stats.total_objects();
 	let index_pct = (100 * stats.indexed_objects()) / stats.total_objects();
+	// Preserve the original guard: do not multiply when the total is zero.
+	#[allow(clippy::manual_checked_ops)]
 	let co_pct = if state.total > 0 { (100 * state.current) / state.total } else { 0 };
 	let kbytes = stats.received_bytes() / 1024;
 	if stats.received_objects() == stats.total_objects() {

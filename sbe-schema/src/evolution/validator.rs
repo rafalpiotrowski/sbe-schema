@@ -47,12 +47,13 @@ impl<'a> SchemaValidator for SbeSchemaValidator<'a> {
 		match current.cmp(&latest) {
 			std::cmp::Ordering::Less => Ok(CompatibilityLevel::None),
 			std::cmp::Ordering::Equal => Ok(CompatibilityLevel::NoChange),
-			std::cmp::Ordering::Greater =>
+			std::cmp::Ordering::Greater => {
 				if current - latest == 1 {
 					Ok(CompatibilityLevel::Full)
 				} else {
 					Ok(CompatibilityLevel::None)
-				},
+				}
+			},
 		}
 	}
 
@@ -61,8 +62,9 @@ impl<'a> SchemaValidator for SbeSchemaValidator<'a> {
 		let current = self.current().message_header();
 
 		match (latest, current) {
-			(Some(latest), Some(current)) =>
-				Ok(PartialCompatibility::partial_compatibility(current, latest)),
+			(Some(latest), Some(current)) => {
+				Ok(PartialCompatibility::partial_compatibility(current, latest))
+			},
 			// SBE requires message header to be defined
 			_ => Err(EvolutionError::MissingMessageHeader),
 		}
@@ -125,7 +127,7 @@ impl<'a> SchemaValidator for SbeSchemaValidator<'a> {
 	}
 }
 
-fn flat_types(types: Option<&Vec<Types>>) -> FlatTypes {
+fn flat_types(types: Option<&Vec<Types>>) -> FlatTypes<'_> {
 	let mut flat_types = FlatTypes { enums: None, composites: None, sets: None };
 
 	if let Some(types) = types {

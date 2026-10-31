@@ -13,7 +13,7 @@ pub fn reset() -> io::Result<()> {
 	Ok(())
 }
 
-/// Write a message
+// Write a message
 // pub fn write(text: &str, color: Color) -> io::Result<()> {
 //     let mut stdout = StandardStream::stdout(ColorChoice::Always);
 //     stdout.set_color(ColorSpec::default().set_fg(Some(color)))?;
@@ -21,7 +21,7 @@ pub fn reset() -> io::Result<()> {
 //     Ok(())
 // }
 
-/// Write a warning message
+// Write a warning message
 // pub fn warn(text: &str) -> io::Result<()> {
 //     let mut stdout = StandardStream::stdout(ColorChoice::Always);
 //     stdout.set_color(ColorSpec::new().set_fg(Some(Color::Magenta)))?;
@@ -29,7 +29,7 @@ pub fn reset() -> io::Result<()> {
 //     Ok(())
 // }
 
-/// Write a debug message
+// Write a debug message
 // pub fn debug(text: &str) -> io::Result<()> {
 //     let mut stdout = StandardStream::stdout(ColorChoice::Always);
 //     stdout.set_color(ColorSpec::new().set_fg(Some(Color::Cyan)))?;
@@ -45,7 +45,7 @@ pub fn info(text: &str) -> io::Result<()> {
 	Ok(())
 }
 
-/// Write a success message
+// Write a success message
 // pub fn success(text: &str) -> io::Result<()> {
 //     let mut stdout = StandardStream::stdout(ColorChoice::Always);
 //     stdout.set_color(ColorSpec::new().set_fg(Some(Color::Green)))?;

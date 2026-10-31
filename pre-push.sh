@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-cargo +nightly fmt -- --emit files
-cargo clippy --all-targets --all-features --workspace -- -D warnings #-W clippy::nursery
-# TODO: change --lib to --all-targets for the integration tests to run
-cargo test --all-features --lib -- --test-threads=1
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+cargo test --workspace --all-targets --all-features --locked
+cargo test --workspace --doc --locked

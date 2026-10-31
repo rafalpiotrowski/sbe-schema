@@ -1,79 +1,38 @@
 name: Rust CI
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    types: [opened, repoened, synchronize]
+    types: [opened, reopened, synchronize]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_NET_GIT_FETCH_WITH_CLI: 'true'
 
 jobs:
-  test:
-    name: Test Rust ${{matrix.toolchain}} on ${{matrix.os}}
-    runs-on: ${{matrix.os}}-latest
+  rust:
+    name: Rust ${{ matrix.toolchain }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        toolchain: [stable, nightly]
-        os: [ubuntu] # linux-only
+        os: [ubuntu-latest, windows-latest]
+        toolchain: [1.99.1, stable]
     steps:
-      - uses: actions/checkout@main
-        with:
-          submodules: 'true'
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu' # See 'Supported distributions' for available options
-          java-version: '21'           
-      - name: Install rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{matrix.toolchain}}
-          override: true
-      - name: Test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --all-targets -- --test-threads=1
-        env:
-          RUST_LOG: 'trace'
-
-  clippy:
-    name: Clippy
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu' # See 'Supported distributions' for available options
-          java-version: '21'  
-      - name: Install minimal stable with clippy and rustfmt
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          components: clippy
-          override: true
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Install compiler and tools
+        run: rustup toolchain install ${{ matrix.toolchain }} --profile minimal --component rustfmt --component clippy
+      - name: Formatting
+        if: matrix.toolchain == '1.99.1'
+        run: cargo +${{ matrix.toolchain }} fmt --all -- --check
+      - name: Tests (no Java or network access required by tests)
+        run: cargo +${{ matrix.toolchain }} test --workspace --all-targets --all-features --locked
+      - name: Documentation tests
+        run: cargo +${{ matrix.toolchain }} test --workspace --doc --locked
       - name: Clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: --all --all-targets --all-features -- -D clippy::all -D warnings
-
-  rustfmt:
-    name: rustfmt
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Install minimal stable with rustfmt
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: nightly
-          components: rustfmt
-          override: true
-
-      - name: rustfmt
-        uses: actions-rs/cargo@v1
-        with:
-          toolchain: nightly
-          command: fmt
-          args: --all -- --check
+        run: cargo +${{ matrix.toolchain }} clippy --workspace --all-targets --all-features --locked -- -D warnings
+      - name: API documentation
+        run: cargo +${{ matrix.toolchain }} doc --workspace --no-deps --locked

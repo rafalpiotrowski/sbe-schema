@@ -21,19 +21,19 @@ impl Optional for Ref {
 	}
 }
 
-impl<'a> Optional for &'a Composite {
+impl Optional for &Composite {
 	fn is_optional(&self) -> bool {
 		false
 	}
 }
 
-impl<'a> Optional for &'a EnumType {
+impl Optional for &EnumType {
 	fn is_optional(&self) -> bool {
 		false
 	}
 }
 
-impl<'a> Optional for &'a SetType {
+impl Optional for &SetType {
 	fn is_optional(&self) -> bool {
 		false
 	}

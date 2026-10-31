@@ -48,13 +48,13 @@ pub struct Schema {
 
 impl PartialEq for Schema {
 	fn eq(&self, other: &Self) -> bool {
-		self.package == other.package &&
-			self.id == other.id &&
-			self.version == other.version &&
-			self.semantic_version == other.semantic_version &&
-			self.byte_order == other.byte_order &&
-			self.types == other.types &&
-			self.messages == other.messages
+		self.package == other.package
+			&& self.id == other.id
+			&& self.version == other.version
+			&& self.semantic_version == other.semantic_version
+			&& self.byte_order == other.byte_order
+			&& self.types == other.types
+			&& self.messages == other.messages
 	}
 }
 
@@ -105,7 +105,7 @@ impl Schema {
 
 /// build vtable for lookups
 /// type name -> composite/enum/set/type
-pub fn build_vtable(schema: &Schema) -> VTable {
+pub fn build_vtable(schema: &Schema) -> VTable<'_> {
 	let mut vtable = VTable::new();
 	if let Some(types) = schema.types.as_ref() {
 		for t in types {
@@ -171,11 +171,11 @@ pub struct Message {
 
 impl PartialEq for Message {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name &&
-			self.id == other.id &&
-			self.fields == other.fields &&
-			self.groups == other.groups &&
-			self.semantic_type == other.semantic_type
+		self.name == other.name
+			&& self.id == other.id
+			&& self.fields == other.fields
+			&& self.groups == other.groups
+			&& self.semantic_type == other.semantic_type
 	}
 }
 
@@ -217,12 +217,12 @@ pub struct Group {
 
 impl PartialEq for Group {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name &&
-			self.id == other.id &&
-			self.dimension_type == other.dimension_type &&
-			self.fields == other.fields &&
-			self.data == other.data &&
-			self.since_version == other.since_version
+		self.name == other.name
+			&& self.id == other.id
+			&& self.dimension_type == other.dimension_type
+			&& self.fields == other.fields
+			&& self.data == other.data
+			&& self.since_version == other.since_version
 	}
 }
 
@@ -259,10 +259,10 @@ pub struct Field {
 
 impl PartialEq for Field {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name &&
-			self.id == other.id &&
-			self.r#type == other.r#type &&
-			self.since_version == other.since_version
+		self.name == other.name
+			&& self.id == other.id
+			&& self.r#type == other.r#type
+			&& self.since_version == other.since_version
 	}
 }
 
@@ -293,10 +293,10 @@ pub struct Data {
 
 impl PartialEq for Data {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name &&
-			self.id == other.id &&
-			self.r#type == other.r#type &&
-			self.since_version == other.since_version
+		self.name == other.name
+			&& self.id == other.id
+			&& self.r#type == other.r#type
+			&& self.since_version == other.since_version
 	}
 }
 
@@ -350,9 +350,9 @@ pub struct EnumType {
 
 impl PartialEq for EnumType {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name &&
-			self.encoding_type == other.encoding_type &&
-			self.valid_values == other.valid_values
+		self.name == other.name
+			&& self.encoding_type == other.encoding_type
+			&& self.valid_values == other.valid_values
 	}
 }
 
@@ -411,9 +411,9 @@ pub struct SetType {
 
 impl PartialEq for SetType {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name &&
-			self.encoding_type == other.encoding_type &&
-			self.choices == other.choices
+		self.name == other.name
+			&& self.encoding_type == other.encoding_type
+			&& self.choices == other.choices
 	}
 }
 
@@ -508,10 +508,10 @@ pub struct Ref {
 
 impl PartialEq for Ref {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name &&
-			self.ref_type == other.ref_type &&
-			self.value_ref == other.value_ref &&
-			self.presence == other.presence
+		self.name == other.name
+			&& self.ref_type == other.ref_type
+			&& self.value_ref == other.value_ref
+			&& self.presence == other.presence
 	}
 }
 
@@ -562,15 +562,15 @@ pub struct Type {
 
 impl PartialEq for Type {
 	fn eq(&self, other: &Self) -> bool {
-		self.name == other.name &&
-			self.primitive_type == other.primitive_type &&
-			self.length == other.length &&
-			self.max_value == other.max_value &&
-			self.min_value == other.min_value &&
-			self.null_value == other.null_value &&
-			self.character_encoding == other.character_encoding &&
-			self.since_version == other.since_version &&
-			self.value == other.value
+		self.name == other.name
+			&& self.primitive_type == other.primitive_type
+			&& self.length == other.length
+			&& self.max_value == other.max_value
+			&& self.min_value == other.min_value
+			&& self.null_value == other.null_value
+			&& self.character_encoding == other.character_encoding
+			&& self.since_version == other.since_version
+			&& self.value == other.value
 	}
 }
 

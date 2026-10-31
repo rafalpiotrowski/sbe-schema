@@ -1,5 +1,5 @@
 [![Crates.io](https://img.shields.io/crates/v/sbe-schema)](https://crates.io/crates/sbe-schema)
-[![minimum rustc version](https://img.shields.io/badge/rustc-1.64+-green.svg)](https://blog.rust-lang.org/2019/11/07/Rust-1.64.0.html)
+[![development toolchain](https://img.shields.io/badge/toolchain-1.99.1-green.svg)](https://blog.rust-lang.org/2026/10/15/Rust-1.99.1/)
 [![Build Status](https://github.com/rafalpiotrowski/sbe-schema/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/rafalpiotrowski/sbe-schema)
 
 
@@ -11,6 +11,17 @@ This repo has two projects.
 
 1. sbe-schema - which is a library that is used by the sbe cli tool to work with sbe schemas
 2. sbe - cli utility tool to work with sbe schemas
+
+Development uses Rust 1.99.1, pinned in `rust-toolchain.toml`, with edition 2021.
+The original 0.1 APIs and CLI workflows are retained. `Cargo.lock` records the
+original dependencies, including the semver fork that accepts versions such as
+`5.2`. This compiler upgrade does not establish a new library MSRV policy.
+
+Run `cargo test --workspace --all-targets --all-features --locked` and
+`cargo clippy --workspace --all-targets --all-features --locked -- -D warnings`
+to check the workspace. Future functional work is recorded in
+[the implementation plan](docs/implementation-plan.md); see also
+[the rollback status](docs/implementation-status.md).
 
 ## sbe cli
 

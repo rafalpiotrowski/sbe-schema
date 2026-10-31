@@ -16,7 +16,7 @@ pub use evolution::{
 };
 pub use types::{build_vtable, Schema, VTable};
 
-/// Result type returned from methods that have [`enum@self::Error`].
+/// Result type returned from methods that have [`SbeSchemaError`].
 pub type Result<T> = StdResult<T, SbeSchemaError>;
 
 /// Errors that can occur when working with SBE schema files.

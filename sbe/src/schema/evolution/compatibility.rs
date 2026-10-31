@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use anyhow::Result;
-use clap::{command, Parser, ValueEnum};
+use clap::{Parser, ValueEnum};
 use sbe_schema::{FullCompatibility, NoneCompatibility, SbeSchemaValidator, Validator};
 
 use crate::term::info;

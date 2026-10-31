@@ -17,7 +17,7 @@ mod schema;
 mod term;
 mod tool;
 
-use clap::{command, Parser, Subcommand};
+use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
 #[command(author, version, about = "SBE schema tool", long_about = None, propagate_version = true)]

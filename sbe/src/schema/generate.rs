@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{bail, Result};
-use clap::{command, Parser, ValueEnum};
+use clap::{Parser, ValueEnum};
 use std::process::Command;
 
 #[derive(Parser, Debug)]
@@ -53,9 +53,9 @@ pub fn run(args: GenerateArgs) -> Result<()> {
 
 	cmd.arg(format!(
 		"-Dsbe.output.dir={0}",
-		&args.output_dir.unwrap_or(DEFAULT_SBE_OUTPUT_DIR.into()).to_str().unwrap()
+		args.output_dir.unwrap_or(DEFAULT_SBE_OUTPUT_DIR.into()).to_str().unwrap()
 	))
-	.arg(format!("-Dsbe.xinclude.aware={}", &args.xinclude.unwrap_or(DEFAULT_SBE_XINCLUDE_FLAG)));
+	.arg(format!("-Dsbe.xinclude.aware={}", args.xinclude.unwrap_or(DEFAULT_SBE_XINCLUDE_FLAG)));
 
 	match &args.language {
 		Language::Csharp => {
@@ -65,7 +65,7 @@ pub fn run(args: GenerateArgs) -> Result<()> {
 			panic!("TypeScript is not supported yet")
 		},
 		_ => {
-			cmd.arg(format!("-Dsbe.target.language={:?}", &args.language));
+			cmd.arg(format!("-Dsbe.target.language={:?}", args.language));
 		},
 	}
 
